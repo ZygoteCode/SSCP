@@ -210,24 +210,24 @@ namespace SSCP
 
                 data = data.Skip(8).ToArray();
 
-                byte[] packetId = data.Take(6).ToArray();
-                data = data.Skip(6).ToArray();
+                byte[] packetId = data.Take(SscpGlobal.PacketIdSize).ToArray();
+                data = data.Skip(SscpGlobal.PacketIdSize).ToArray();
 
                 if (sscpServerUser.PacketIds.Contains(packetId))
                 {
                     goto close;
                 }
 
-                sscpServerUser.PacketNumber = sscpServerUser.PacketNumber + 0.0001;
+                sscpServerUser.PacketNumber = sscpServerUser.PacketNumber + SscpGlobal.PacketNumberIncremental;
 
-                if (sscpServerUser.PacketNumber >= 1000000000000)
+                if (sscpServerUser.PacketNumber >= SscpGlobal.MaxPacketNumber)
                 {
                     sscpServerUser.PacketNumber = 0.0;
                 }
 
                 sscpServerUser.PacketIds.Add(packetId);
 
-                if (sscpServerUser.PacketIds.Count > 100)
+                if (sscpServerUser.PacketIds.Count > SscpGlobal.PacketIdsMaxCount)
                 {
                     sscpServerUser.PacketIds.Clear();
                 }

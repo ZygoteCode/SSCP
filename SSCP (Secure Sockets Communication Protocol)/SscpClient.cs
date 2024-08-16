@@ -51,25 +51,25 @@ namespace SSCP
 
         public async Task SendAsync(byte[] data)
         {
-            byte[] packetId = _random.GetRandomByteArray(6);
+            byte[] packetId = _random.GetRandomByteArray(SscpGlobal.PacketIdSize);
 
             while (_lastPacketIds.Contains(packetId))
             {
-                packetId = _random.GetRandomByteArray(6);
+                packetId = _random.GetRandomByteArray(SscpGlobal.PacketIdSize);
             }
 
             _lastPacketIds.Add(packetId);
 
-            if (_lastPacketIds.Count > 100)
+            if (_lastPacketIds.Count > SscpGlobal.PacketIdsMaxCount)
             {
                 _lastPacketIds.Clear();
             }
 
             data = SscpUtils.Combine(BitConverter.GetBytes(_packetNumber), packetId, data);
             await _client.SendAsync(new ArraySegment<byte>(data), WebSocketMessageType.Binary, true, CancellationToken.None);
-            _packetNumber += 0.0001;
+            _packetNumber += SscpGlobal.PacketNumberIncremental;
 
-            if (_packetNumber >= 1000000000000)
+            if (_packetNumber >= SscpGlobal.MaxPacketNumber)
             {
                 _packetNumber = 0.0;
             }
@@ -118,7 +118,7 @@ namespace SSCP
                 }
 
                 data = data.Skip(8).ToArray();
-                byte[] packetId = data.Take(6).ToArray();
+                byte[] packetId = data.Take(SscpGlobal.PacketIdSize).ToArray();
 
                 if (_serverPacketIds.Contains(packetId))
                 {
@@ -126,17 +126,17 @@ namespace SSCP
                     return;
                 }
 
-                data = data.Skip(6).ToArray();
-                _serverPacketNumber = _serverPacketNumber + 0.0001;
+                data = data.Skip(SscpGlobal.PacketIdSize).ToArray();
+                _serverPacketNumber = _serverPacketNumber + SscpGlobal.PacketNumberIncremental;
 
-                if (_serverPacketNumber >= 1000000000000)
+                if (_serverPacketNumber >= SscpGlobal.MaxPacketNumber)
                 {
                     _serverPacketNumber = 0.0;
                 }
 
                 _serverPacketIds.Add(packetId);
 
-                if (_serverPacketIds.Count > 0)
+                if (_serverPacketIds.Count > SscpGlobal.PacketIdsMaxCount)
                 {
                     _serverPacketIds.Clear();
                 }

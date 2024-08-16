@@ -82,25 +82,25 @@ namespace SSCP
 
         public async Task SendAsync(byte[] data)
         {
-            byte[] packetId = SscpGlobal.SscpRandom.GetRandomByteArray(6);
+            byte[] packetId = SscpGlobal.SscpRandom.GetRandomByteArray(SscpGlobal.PacketIdSize);
 
             while (ServerPacketIds.Contains(packetId))
             {
-                packetId = SscpGlobal.SscpRandom.GetRandomByteArray(6);
+                packetId = SscpGlobal.SscpRandom.GetRandomByteArray(SscpGlobal.PacketIdSize);
             }
 
             data = SscpUtils.Combine(BitConverter.GetBytes(ServerPacketNumber), packetId, data);
             await _webSocket.SendAsync(new ArraySegment<byte>(data), WebSocketMessageType.Binary, true, CancellationToken.None);
             ServerPacketNumber += 0.0001;
 
-            if (ServerPacketNumber >= 1000000000000)
+            if (ServerPacketNumber >= SscpGlobal.MaxPacketNumber)
             {
                 ServerPacketNumber = 0.0;
             }
 
             ServerPacketIds.Add(packetId);
 
-            if (ServerPacketIds.Count > 100)
+            if (ServerPacketIds.Count > SscpGlobal.PacketIdsMaxCount)
             {
                 ServerPacketIds.Clear();
             }
