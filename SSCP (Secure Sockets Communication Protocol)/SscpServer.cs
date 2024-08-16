@@ -198,8 +198,24 @@ namespace SSCP
                 }
                 while (!result.EndOfMessage);
 
-                MessageReceived?.Invoke(sscpServerUser, receivedData.ToArray());
+                byte[] data = receivedData.ToArray();
                 receivedData.Clear();
+
+                double packetNumber = BitConverter.ToDouble(data.Take(8).ToArray(), 0);
+
+                if (packetNumber != sscpServerUser.PacketNumber)
+                {
+                    goto close;
+                }
+
+                data = data.Skip(8).ToArray();
+                MessageReceived?.Invoke(sscpServerUser, data);
+                sscpServerUser.PacketNumber = sscpServerUser.PacketNumber + 0.0001;
+
+                if (sscpServerUser.PacketNumber >= 1000000000000)
+                {
+                    sscpServerUser.PacketNumber = 0.0;
+                }
             }
 
             close: await KickAsync(sscpServerUser);

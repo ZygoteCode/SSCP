@@ -10,6 +10,7 @@ namespace SSCP
         private WebSocket _webSocket;
         private IPEndPoint _ipEndPoint;
         private string _id;
+        private double _packetNumber;
 
         public bool Connected
         {
@@ -51,12 +52,26 @@ namespace SSCP
             }
         }
 
+        public double PacketNumber
+        {
+            get
+            {
+                return _packetNumber;
+            }
+
+            set
+            {
+                _packetNumber = value;
+            }
+        }
+
         public SscpServerUser(SscpServer server, WebSocket webSocket, IPEndPoint ipEndPoint, string id)
         {
             _server = server;
             _webSocket = webSocket;
             _ipEndPoint = ipEndPoint;
             _id = id;
+            _packetNumber = 0.0;
         }
 
         public void Dispose()

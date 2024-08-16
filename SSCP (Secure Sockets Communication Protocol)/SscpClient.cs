@@ -10,6 +10,7 @@ namespace SSCP
 
         private ClientWebSocket _client;
         private string _uri;
+        private double _packetNumber;
 
         public SscpClient(string host, ushort port = 9987)
         {
@@ -19,6 +20,7 @@ namespace SSCP
         public async Task ConnectAsync()
         {
             _client = new ClientWebSocket();
+            _packetNumber = 0.0;
             await _client.ConnectAsync(new Uri(_uri), CancellationToken.None);
             ConnectionOpened?.Invoke();
             Task.Run(async () =>
@@ -45,7 +47,14 @@ namespace SSCP
 
         public async Task SendAsync(byte[] data)
         {
+            data = SscpUtils.Combine(BitConverter.GetBytes(_packetNumber), data);
             await _client.SendAsync(new ArraySegment<byte>(data), WebSocketMessageType.Binary, true, CancellationToken.None);
+            _packetNumber += 0.0001;
+
+            if (_packetNumber >= 1000000000000)
+            {
+                _packetNumber = 0.0;
+            }
         }
 
         public async Task SendAsync(string data)
