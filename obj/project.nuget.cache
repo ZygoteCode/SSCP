@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "TeR8vdo9Z8k=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\bolog\\Desktop\\Computer\\SSCP\\SSCP\\SSCP.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\bolog\\.nuget\\packages\\bouncycastle.cryptography\\2.4.0\\bouncycastle.cryptography.2.4.0.nupkg.sha512"
+  ],
+  "logs": []
+}
