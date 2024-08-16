@@ -1,4 +1,6 @@
-﻿using System.Net.WebSockets;
+﻿using System.Net;
+using System.Net.WebSockets;
+using System.Security.Cryptography;
 using System.Text;
 using SSCP.Utils;
 
@@ -6,15 +8,63 @@ namespace SSCP
 {
     public class SscpClient
     {
-        public event Action? ConnectionOpened, ConnectionClosed;
+        public event Action? ConnectionOpened, ConnectionClosed, ConnectionHandshake;
         public event Action<byte[]>? MessageReceived;
 
         private ClientWebSocket _client;
         private string _uri;
         private double _packetNumber, _serverPacketNumber;
+        private byte _handshakeStep;
+        private RSACryptoServiceProvider _fromServerRSA, _toServerRSA;
 
         private List<byte[]> _lastPacketIds = new List<byte[]>();
         private List<byte[]> _serverPacketIds = new List<byte[]>();
+
+        private byte[] _aesKey1, _aesKey2, _aesCompleteKey;
+
+        private string _currentId, _currentIpAddress;
+        private int _currentPort;
+        private bool _handshakeCompleted;
+
+        public string ID
+        {
+            get
+            {
+                return _currentId;
+            }
+        }
+
+        public string IpAddress
+        {
+            get
+            {
+                return _currentIpAddress;
+            }
+        }
+
+        public int Port
+        {
+            get
+            {
+                return _currentPort;
+            }
+        }
+
+        public bool HandshakeCompleted
+        {
+            get
+            {
+                return _handshakeCompleted;
+            }
+        }
+
+        public bool Connected
+        {
+            get
+            {
+                return _client.State.Equals(WebSocketState.Open);
+            }
+        }
 
         public SscpClient(string host, ushort port = 9987)
         {
@@ -25,12 +75,16 @@ namespace SSCP
         {
             _client = new ClientWebSocket();
             _packetNumber = _serverPacketNumber = 0.0;
+            _handshakeStep = 0;
+            _lastPacketIds.Clear();
+            _serverPacketIds.Clear();
             await _client.ConnectAsync(new Uri(_uri), CancellationToken.None);
             ConnectionOpened?.Invoke();
             Task.Run(async () =>
             {
                 await ReceiveMessages();
             });
+            _handshakeStep = 1;
         }
 
         public void Connect()
@@ -68,6 +122,11 @@ namespace SSCP
             data = SscpUtils.Combine(BitConverter.GetBytes(_packetNumber), packetId, BitConverter.GetBytes(SscpUtils.GetTimestamp()), data);
             byte[] hash = SscpUtils.HashMD5(data);
             data = SscpUtils.Combine(hash, data);
+
+            if (_aesCompleteKey != null)
+            {
+                data = SscpUtils.ProcessAES256(data, _aesCompleteKey, new byte[16], true);
+            }
 
             await _client.SendAsync(new ArraySegment<byte>(data), WebSocketMessageType.Binary, true, CancellationToken.None);
             _packetNumber += SscpGlobal.PacketNumberIncremental;
@@ -111,6 +170,11 @@ namespace SSCP
 
                 byte[] data = receivedData.ToArray();
                 receivedData.Clear();
+
+                if (_aesCompleteKey != null)
+                {
+                    data = SscpUtils.ProcessAES256(data, _aesCompleteKey, new byte[16], false);
+                }
 
                 byte[] hash = data.Take(16).ToArray();
                 data = data.Skip(16).ToArray();
@@ -163,7 +227,45 @@ namespace SSCP
                     _serverPacketIds.Clear();
                 }
 
-                MessageReceived?.Invoke(data);
+                if (_handshakeStep == 1)
+                {
+                    _fromServerRSA = new RSACryptoServiceProvider();
+                    _fromServerRSA.FromXmlString(Encoding.UTF8.GetString(data));
+
+                    _toServerRSA = new RSACryptoServiceProvider(SscpGlobal.RsaKeyLength);
+                    Send(Encoding.UTF8.GetBytes(_toServerRSA.ToXmlString(false)));
+
+                    _handshakeStep = 2;
+                }
+                else if (_handshakeStep == 2)
+                {
+                    _aesKey1 = _toServerRSA.Decrypt(data, false);
+                    _aesKey2 = SscpGlobal.SscpRandom.GetRandomBytes(16);
+
+                    Send(_fromServerRSA.Encrypt(_aesKey2, false));
+                    _aesCompleteKey = SscpUtils.Combine(_aesKey1, _aesKey2);
+                    _handshakeStep = 3;
+                }
+                else if (_handshakeStep == 3)
+                {
+                    _currentId = Encoding.UTF8.GetString(data.Take(32).ToArray());
+                    data = data.Skip(32).ToArray();
+
+                    int ipLength = BitConverter.ToInt32(data.Take(4).ToArray());
+                    data = data.Skip(4).ToArray();
+
+                    _currentIpAddress = Encoding.UTF8.GetString(data.Take(ipLength).ToArray());
+                    data = data.Skip(ipLength).ToArray();
+
+                    _currentPort = BitConverter.ToInt32(data.Take(4).ToArray());
+                    _handshakeStep = 4;
+                    _handshakeCompleted = true;
+                    ConnectionHandshake?.Invoke();
+                }
+                else if (_handshakeStep == 4)
+                {
+                    MessageReceived?.Invoke(data);
+                }
             }
         }
     }

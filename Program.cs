@@ -12,11 +12,13 @@ class Program
         _sscpClient.ConnectionOpened += _sscpClient_ConnectionOpened;
         _sscpClient.ConnectionClosed += _sscpClient_ConnectionClosed;
         _sscpClient.MessageReceived += _sscpClient_MessageReceived;
+        _sscpClient.ConnectionHandshake += _sscpClient_ConnectionHandshake;
 
         _sscpServer = new SscpServer(9987);
         _sscpServer.UserConnected += _sscpServer_UserConnected;
         _sscpServer.UserDisconnected += _sscpServer_UserDisconnected;
         _sscpServer.MessageReceived += _sscpServer_MessageReceived;
+        _sscpServer.UserHandshake += _sscpServer_UserHandshake;
 
         new Thread(() =>
         {
@@ -29,6 +31,16 @@ class Program
         {
             await _sscpClient.SendAsync(Encoding.UTF8.GetBytes(Console.ReadLine()!));
         }
+    }
+
+    private static void _sscpServer_UserHandshake(SscpServerUser obj)
+    {
+        Console.WriteLine("[SERVER] A User completed the Handshake procedure.");
+    }
+
+    private static void _sscpClient_ConnectionHandshake()
+    {
+        Console.WriteLine($"[CLIENT] Handshake completed with Server. Current IP: {_sscpClient.IpAddress}, port: {_sscpClient.Port}, ID: {_sscpClient.ID}");
     }
 
     private static void _sscpServer_UserConnected(SscpServerUser obj)

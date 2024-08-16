@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.WebSockets;
+using System.Security.Cryptography;
 using System.Text;
 using SSCP.Utils;
 
@@ -52,6 +53,13 @@ namespace SSCP
 
         public List<byte[]> PacketIds { get; set; }
         public List<byte[]> ServerPacketIds { get; set; }
+        public byte HandshakeStep { get; set; }
+        public RSACryptoServiceProvider ToClientRSA { get; set; }
+        public RSACryptoServiceProvider FromClientRSA { get; set; }
+        public byte[] AesKey1 { get; set; }
+        public byte[] AesKey2 { get; set; }
+        public byte[] AesCompleteKey { get; set; }
+        public bool HandshakeCompleted { get; set; }
 
         public SscpServerUser(SscpServer server, WebSocket webSocket, IPEndPoint ipEndPoint, string id)
         {
@@ -63,6 +71,7 @@ namespace SSCP
             ServerPacketNumber = 0.0;
             PacketIds = new List<byte[]>();
             ServerPacketIds = new List<byte[]>();
+            HandshakeStep = 0;
         }
 
         public void Dispose()
@@ -92,6 +101,11 @@ namespace SSCP
             data = SscpUtils.Combine(BitConverter.GetBytes(ServerPacketNumber), packetId, BitConverter.GetBytes(SscpUtils.GetTimestamp()), data);
             byte[] hash = SscpUtils.HashMD5(data);
             data = SscpUtils.Combine(hash, data);
+
+            if (AesCompleteKey != null)
+            {
+                data = SscpUtils.ProcessAES256(data, AesCompleteKey, new byte[16], true);
+            }
             
             await _webSocket.SendAsync(new ArraySegment<byte>(data), WebSocketMessageType.Binary, true, CancellationToken.None);
             ServerPacketNumber += 0.0001;

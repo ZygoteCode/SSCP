@@ -1,4 +1,7 @@
-﻿using System.Security.Cryptography;
+﻿using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Security;
+using System.Security.Cryptography;
 
 namespace SSCP.Utils
 {
@@ -44,6 +47,20 @@ namespace SSCP.Utils
             }
 
             return true;
+        }
+
+        public static byte[] ProcessAES256(byte[] data, byte[] key, byte[] iv, bool isEncrypt)
+        {
+            IBufferedCipher cipher = CipherUtilities.GetCipher("AES/GCM/NoPadding");
+            KeyParameter keyParameter = ParameterUtilities.CreateKeyParameter("AES", key);
+            ParametersWithIV parameters = new ParametersWithIV(keyParameter, iv);
+            cipher.Init(isEncrypt, parameters);
+
+            byte[] processed = new byte[cipher.GetOutputSize(data.Length)];
+            int len = cipher.ProcessBytes(data, 0, data.Length, processed, 0);
+            cipher.DoFinal(processed, len);
+
+            return processed;
         }
     }
 }

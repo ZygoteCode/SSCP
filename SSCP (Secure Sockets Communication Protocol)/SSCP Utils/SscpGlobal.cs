@@ -8,5 +8,6 @@
         public const int PacketIdSize = 6;
         public const int PacketIdsMaxCount = 100;
         public const long MaxTimestampDelay = 10000;
+        public const int RsaKeyLength = 2048;
     }
 }

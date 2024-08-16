@@ -3,13 +3,14 @@ using System.Net.WebSockets;
 using System.Net;
 using System.Text;
 using SSCP.Utils;
+using Org.BouncyCastle.Tls;
 
 namespace SSCP
 {
     public class SscpServer
     {
         public event Action<SscpServerUser, byte[]>? MessageReceived;
-        public event Action<SscpServerUser>? UserConnected, UserDisconnected;
+        public event Action<SscpServerUser>? UserConnected, UserDisconnected, UserHandshake;
 
         private ConcurrentDictionary<SscpServerUser, Task> _users = new ConcurrentDictionary<SscpServerUser, Task>();
         private HttpListener _httpListener;
@@ -40,6 +41,8 @@ namespace SSCP
                         Task userTask = Task.Run(() => HandleWebSocketCommunication(sscpServerUser));
                         _users.TryAdd(sscpServerUser, userTask);
                         UserConnected?.Invoke(sscpServerUser);
+                        sscpServerUser.HandshakeStep = 1;
+                        SendRSAKey(sscpServerUser);
                     }
                     else
                     {
@@ -52,6 +55,13 @@ namespace SSCP
 
                 }
             }
+        }
+
+        private void SendRSAKey(SscpServerUser sscpServerUser)
+        {
+            sscpServerUser.ToClientRSA = new System.Security.Cryptography.RSACryptoServiceProvider(SscpGlobal.RsaKeyLength);
+            Send(sscpServerUser, Encoding.UTF8.GetBytes(sscpServerUser.ToClientRSA.ToXmlString(false)));
+            sscpServerUser.HandshakeStep = 2;
         }
 
         public void Start()
@@ -201,6 +211,11 @@ namespace SSCP
                 byte[] data = receivedData.ToArray();
                 receivedData.Clear();
 
+                if (sscpServerUser.AesCompleteKey != null)
+                {
+                    data = SscpUtils.ProcessAES256(data, sscpServerUser.AesCompleteKey, new byte[16], false);
+                }
+
                 byte[] hash = data.Take(16).ToArray();
                 data = data.Skip(16).ToArray();
                 byte[] newHash = SscpUtils.HashMD5(data);
@@ -250,8 +265,32 @@ namespace SSCP
                     sscpServerUser.PacketIds.Clear();
                 }
 
-                MessageReceived?.Invoke(sscpServerUser, data);
-                Send(sscpServerUser, $"I respond you to the message!");
+                if (sscpServerUser.HandshakeStep == 2)
+                {
+                    sscpServerUser.FromClientRSA = new System.Security.Cryptography.RSACryptoServiceProvider();
+                    sscpServerUser.FromClientRSA.FromXmlString(Encoding.UTF8.GetString(data));
+                    sscpServerUser.AesKey1 = SscpGlobal.SscpRandom.GetRandomBytes(16);
+                    Send(sscpServerUser, sscpServerUser.FromClientRSA.Encrypt(sscpServerUser.AesKey1, false));
+                    sscpServerUser.HandshakeStep = 3;
+                }
+                else if (sscpServerUser.HandshakeStep == 3)
+                {
+                    sscpServerUser.AesKey2 = sscpServerUser.ToClientRSA.Decrypt(data, false);
+                    sscpServerUser.AesCompleteKey = SscpUtils.Combine(sscpServerUser.AesKey1, sscpServerUser.AesKey2);
+
+                    byte[] ipBytes = Encoding.UTF8.GetBytes(sscpServerUser.ConnectionIpAddress);
+                    byte[] toSend = SscpUtils.Combine(Encoding.UTF8.GetBytes(sscpServerUser.ID), BitConverter.GetBytes(ipBytes.Length), ipBytes, BitConverter.GetBytes(sscpServerUser.ConnectionPort));
+                    Send(sscpServerUser, toSend);
+
+                    sscpServerUser.HandshakeStep = 4;
+                    sscpServerUser.HandshakeCompleted = true;
+                    UserHandshake?.Invoke(sscpServerUser);
+                }
+                else if (sscpServerUser.HandshakeStep == 4)
+                {
+                    MessageReceived?.Invoke(sscpServerUser, data);
+                    Send(sscpServerUser, $"I respond you to the message!");
+                }
             }
 
             close: await KickAsync(sscpServerUser);
