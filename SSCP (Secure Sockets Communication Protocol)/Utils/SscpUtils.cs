@@ -15,5 +15,10 @@
 
             return ret;
         }
+
+        public static long GetTimestamp()
+        {
+            return DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        }
     }
 }

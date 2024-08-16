@@ -65,7 +65,7 @@ namespace SSCP
                 _lastPacketIds.Clear();
             }
 
-            data = SscpUtils.Combine(BitConverter.GetBytes(_packetNumber), packetId, data);
+            data = SscpUtils.Combine(BitConverter.GetBytes(_packetNumber), packetId, BitConverter.GetBytes(SscpUtils.GetTimestamp()), data);
             await _client.SendAsync(new ArraySegment<byte>(data), WebSocketMessageType.Binary, true, CancellationToken.None);
             _packetNumber += SscpGlobal.PacketNumberIncremental;
 
@@ -127,6 +127,15 @@ namespace SSCP
                 }
 
                 data = data.Skip(SscpGlobal.PacketIdSize).ToArray();
+                long timestamp = BitConverter.ToInt64(data.Take(8).ToArray());
+
+                if (SscpUtils.GetTimestamp() - timestamp > SscpGlobal.MaxTimestampDelay)
+                {
+                    await DisconnectAsync();
+                    return;
+                }
+
+                data = data.Skip(8).ToArray();
                 _serverPacketNumber = _serverPacketNumber + SscpGlobal.PacketNumberIncremental;
 
                 if (_serverPacketNumber >= SscpGlobal.MaxPacketNumber)

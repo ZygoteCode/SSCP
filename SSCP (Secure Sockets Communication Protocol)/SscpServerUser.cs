@@ -89,7 +89,7 @@ namespace SSCP
                 packetId = SscpGlobal.SscpRandom.GetRandomByteArray(SscpGlobal.PacketIdSize);
             }
 
-            data = SscpUtils.Combine(BitConverter.GetBytes(ServerPacketNumber), packetId, data);
+            data = SscpUtils.Combine(BitConverter.GetBytes(ServerPacketNumber), packetId, BitConverter.GetBytes(SscpUtils.GetTimestamp()), data);
             await _webSocket.SendAsync(new ArraySegment<byte>(data), WebSocketMessageType.Binary, true, CancellationToken.None);
             ServerPacketNumber += 0.0001;
 

@@ -218,6 +218,14 @@ namespace SSCP
                     goto close;
                 }
 
+                long timestamp = BitConverter.ToInt64(data.Take(8).ToArray());
+                
+                if (SscpUtils.GetTimestamp() - timestamp > SscpGlobal.MaxTimestampDelay)
+                {
+                    goto close;
+                }
+
+                data = data.Skip(8).ToArray();
                 sscpServerUser.PacketNumber = sscpServerUser.PacketNumber + SscpGlobal.PacketNumberIncremental;
 
                 if (sscpServerUser.PacketNumber >= SscpGlobal.MaxPacketNumber)
