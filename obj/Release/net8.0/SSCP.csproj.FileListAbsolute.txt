@@ -10,3 +10,16 @@ C:\Users\bolog\Desktop\Computer\SSCP\SSCP\obj\Release\net8.0\SSCP.dll
 C:\Users\bolog\Desktop\Computer\SSCP\SSCP\obj\Release\net8.0\refint\SSCP.dll
 C:\Users\bolog\Desktop\Computer\SSCP\SSCP\obj\Release\net8.0\SSCP.pdb
 C:\Users\bolog\Desktop\Computer\SSCP\SSCP\obj\Release\net8.0\ref\SSCP.dll
+C:\Users\bolog\Desktop\SSCP\bin\Release\net8.0\SSCP.deps.json
+C:\Users\bolog\Desktop\SSCP\bin\Release\net8.0\SSCP.dll
+C:\Users\bolog\Desktop\SSCP\bin\Release\net8.0\SSCP.pdb
+C:\Users\bolog\Desktop\SSCP\obj\Release\net8.0\SSCP.csproj.AssemblyReference.cache
+C:\Users\bolog\Desktop\SSCP\obj\Release\net8.0\SSCP.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\bolog\Desktop\SSCP\obj\Release\net8.0\SSCP.AssemblyInfoInputs.cache
+C:\Users\bolog\Desktop\SSCP\obj\Release\net8.0\SSCP.AssemblyInfo.cs
+C:\Users\bolog\Desktop\SSCP\obj\Release\net8.0\SSCP.csproj.CoreCompileInputs.cache
+C:\Users\bolog\Desktop\SSCP\obj\Release\net8.0\SSCP.sourcelink.json
+C:\Users\bolog\Desktop\SSCP\obj\Release\net8.0\SSCP.dll
+C:\Users\bolog\Desktop\SSCP\obj\Release\net8.0\refint\SSCP.dll
+C:\Users\bolog\Desktop\SSCP\obj\Release\net8.0\SSCP.pdb
+C:\Users\bolog\Desktop\SSCP\obj\Release\net8.0\ref\SSCP.dll

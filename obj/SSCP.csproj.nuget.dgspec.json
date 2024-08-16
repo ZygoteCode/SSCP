@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\bolog\\Desktop\\Computer\\SSCP\\SSCP\\SSCP.csproj": {}
+    "C:\\Users\\bolog\\Desktop\\SSCP\\SSCP.csproj": {}
   },
   "projects": {
-    "C:\\Users\\bolog\\Desktop\\Computer\\SSCP\\SSCP\\SSCP.csproj": {
+    "C:\\Users\\bolog\\Desktop\\SSCP\\SSCP.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\bolog\\Desktop\\Computer\\SSCP\\SSCP\\SSCP.csproj",
+        "projectUniqueName": "C:\\Users\\bolog\\Desktop\\SSCP\\SSCP.csproj",
         "projectName": "SSCP",
-        "projectPath": "C:\\Users\\bolog\\Desktop\\Computer\\SSCP\\SSCP\\SSCP.csproj",
+        "projectPath": "C:\\Users\\bolog\\Desktop\\SSCP\\SSCP.csproj",
         "packagesPath": "C:\\Users\\bolog\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\bolog\\Desktop\\Computer\\SSCP\\SSCP\\obj\\",
+        "outputPath": "C:\\Users\\bolog\\Desktop\\SSCP\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

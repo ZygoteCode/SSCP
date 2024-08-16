@@ -1,10 +1,10 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\bolog\\Desktop\\Computer\\SSCP\\SSCP\\",
+  "WorkspaceRootPath": "C:\\Users\\bolog\\Desktop\\SSCP\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{EA194B5C-3C85-428F-92D5-94F80ED6DD73}|SSCP.csproj|c:\\users\\bolog\\desktop\\computer\\sscp\\sscp\\sscp components\\sscpserver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{EA194B5C-3C85-428F-92D5-94F80ED6DD73}|SSCP.csproj|solutionrelative:sscp components\\sscpserver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{EA194B5C-3C85-428F-92D5-94F80ED6DD73}|SSCP.csproj|c:\\users\\bolog\\desktop\\sscp\\sscp components\\sscpclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EA194B5C-3C85-428F-92D5-94F80ED6DD73}|SSCP.csproj|solutionrelative:sscp components\\sscpclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -19,14 +19,14 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "SscpServer.cs",
-              "DocumentMoniker": "C:\\Users\\bolog\\Desktop\\Computer\\SSCP\\SSCP\\SSCP Components\\SscpServer.cs",
-              "RelativeDocumentMoniker": "SSCP Components\\SscpServer.cs",
-              "ToolTip": "C:\\Users\\bolog\\Desktop\\Computer\\SSCP\\SSCP\\SSCP Components\\SscpServer.cs",
-              "RelativeToolTip": "SSCP Components\\SscpServer.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAGAAAAAAAAAA==",
+              "Title": "SscpClient.cs",
+              "DocumentMoniker": "C:\\Users\\bolog\\Desktop\\SSCP\\SSCP Components\\SscpClient.cs",
+              "RelativeDocumentMoniker": "SSCP Components\\SscpClient.cs",
+              "ToolTip": "C:\\Users\\bolog\\Desktop\\SSCP\\SSCP Components\\SscpClient.cs",
+              "RelativeToolTip": "SSCP Components\\SscpClient.cs",
+              "ViewState": "AgIAAGEAAAAAAAAAAAAzwFMAAAANAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-08-16T12:06:28.471Z",
+              "WhenOpened": "2024-08-16T15:15:42.895Z",
               "EditorCaption": ""
             }
           ]

@@ -1,5 +1,4 @@
-﻿using System.Net;
-using System.Net.WebSockets;
+﻿using System.Net.WebSockets;
 using System.Security.Cryptography;
 using System.Text;
 using SSCP.Utils;
@@ -8,7 +7,7 @@ namespace SSCP
 {
     public class SscpClient
     {
-        public event Action? ConnectionOpened, ConnectionClosed, ConnectionHandshake;
+        public event Action? ConnectionOpened, ConnectionClosed;
         public event Action<byte[]>? MessageReceived;
 
         private ClientWebSocket _client;
@@ -50,14 +49,6 @@ namespace SSCP
             }
         }
 
-        public bool HandshakeCompleted
-        {
-            get
-            {
-                return _handshakeCompleted;
-            }
-        }
-
         public bool Connected
         {
             get
@@ -79,12 +70,18 @@ namespace SSCP
             _lastPacketIds.Clear();
             _serverPacketIds.Clear();
             await _client.ConnectAsync(new Uri(_uri), CancellationToken.None);
+            _handshakeStep = 1;
             ConnectionOpened?.Invoke();
+
             Task.Run(async () =>
             {
                 await ReceiveMessages();
             });
-            _handshakeStep = 1;
+            
+            while (!_handshakeCompleted)
+            {
+                await Task.Delay(1);
+            }
         }
 
         public void Connect()
@@ -227,44 +224,45 @@ namespace SSCP
                     _serverPacketIds.Clear();
                 }
 
-                if (_handshakeStep == 1)
+                switch (_handshakeStep)
                 {
-                    _fromServerRSA = new RSACryptoServiceProvider();
-                    _fromServerRSA.FromXmlString(Encoding.UTF8.GetString(data));
+                    case 1:
+                        _fromServerRSA = new RSACryptoServiceProvider();
+                        _fromServerRSA.FromXmlString(Encoding.UTF8.GetString(data));
 
-                    _toServerRSA = new RSACryptoServiceProvider(SscpGlobal.RsaKeyLength);
-                    Send(Encoding.UTF8.GetBytes(_toServerRSA.ToXmlString(false)));
+                        _toServerRSA = new RSACryptoServiceProvider(SscpGlobal.RsaKeyLength);
+                        Send(Encoding.UTF8.GetBytes(_toServerRSA.ToXmlString(false)));
 
-                    _handshakeStep = 2;
-                }
-                else if (_handshakeStep == 2)
-                {
-                    _aesKey1 = _toServerRSA.Decrypt(data, false);
-                    _aesKey2 = SscpGlobal.SscpRandom.GetRandomBytes(16);
+                        _handshakeStep = 2;
+                        break;
+                    case 2:
+                        _aesKey1 = _toServerRSA.Decrypt(data, false);
+                        _aesKey2 = SscpGlobal.SscpRandom.GetRandomBytes(16);
 
-                    Send(_fromServerRSA.Encrypt(_aesKey2, false));
-                    _aesCompleteKey = SscpUtils.Combine(_aesKey1, _aesKey2);
-                    _handshakeStep = 3;
-                }
-                else if (_handshakeStep == 3)
-                {
-                    _currentId = Encoding.UTF8.GetString(data.Take(32).ToArray());
-                    data = data.Skip(32).ToArray();
+                        Send(_fromServerRSA.Encrypt(_aesKey2, false));
+                        _aesCompleteKey = SscpUtils.Combine(_aesKey1, _aesKey2);
 
-                    int ipLength = BitConverter.ToInt32(data.Take(4).ToArray());
-                    data = data.Skip(4).ToArray();
+                        _handshakeStep = 3;
+                        break;
+                    case 3:
+                        _currentId = Encoding.UTF8.GetString(data.Take(32).ToArray());
+                        data = data.Skip(32).ToArray();
 
-                    _currentIpAddress = Encoding.UTF8.GetString(data.Take(ipLength).ToArray());
-                    data = data.Skip(ipLength).ToArray();
+                        int ipLength = BitConverter.ToInt32(data.Take(4).ToArray());
+                        data = data.Skip(4).ToArray();
 
-                    _currentPort = BitConverter.ToInt32(data.Take(4).ToArray());
-                    _handshakeStep = 4;
-                    _handshakeCompleted = true;
-                    ConnectionHandshake?.Invoke();
-                }
-                else if (_handshakeStep == 4)
-                {
-                    MessageReceived?.Invoke(data);
+                        _currentIpAddress = Encoding.UTF8.GetString(data.Take(ipLength).ToArray());
+                        data = data.Skip(ipLength).ToArray();
+
+                        _currentPort = BitConverter.ToInt32(data.Take(4).ToArray());
+
+                        _handshakeStep = 4;
+                        _handshakeCompleted = true;
+                        ConnectionOpened?.Invoke();
+                        break;
+                    case 4:
+                        MessageReceived?.Invoke(data);
+                        break;
                 }
             }
         }
