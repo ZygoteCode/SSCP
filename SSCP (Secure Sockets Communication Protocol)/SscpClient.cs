@@ -1,5 +1,6 @@
 ﻿using System.Net.WebSockets;
 using System.Text;
+using SSCP.Utils;
 
 namespace SSCP
 {
@@ -12,7 +13,6 @@ namespace SSCP
         private string _uri;
         private double _packetNumber, _serverPacketNumber;
 
-        private SscpRandom _random = new SscpRandom(2);
         private List<byte[]> _lastPacketIds = new List<byte[]>();
         private List<byte[]> _serverPacketIds = new List<byte[]>();
 
@@ -51,11 +51,11 @@ namespace SSCP
 
         public async Task SendAsync(byte[] data)
         {
-            byte[] packetId = _random.GetRandomByteArray(SscpGlobal.PacketIdSize);
+            byte[] packetId = SscpGlobal.SscpRandom.GetRandomByteArray(SscpGlobal.PacketIdSize);
 
             while (_lastPacketIds.Contains(packetId))
             {
-                packetId = _random.GetRandomByteArray(SscpGlobal.PacketIdSize);
+                packetId = SscpGlobal.SscpRandom.GetRandomByteArray(SscpGlobal.PacketIdSize);
             }
 
             _lastPacketIds.Add(packetId);
@@ -66,6 +66,9 @@ namespace SSCP
             }
 
             data = SscpUtils.Combine(BitConverter.GetBytes(_packetNumber), packetId, BitConverter.GetBytes(SscpUtils.GetTimestamp()), data);
+            byte[] hash = SscpUtils.HashMD5(data);
+            data = SscpUtils.Combine(hash, data);
+
             await _client.SendAsync(new ArraySegment<byte>(data), WebSocketMessageType.Binary, true, CancellationToken.None);
             _packetNumber += SscpGlobal.PacketNumberIncremental;
 
@@ -108,6 +111,16 @@ namespace SSCP
 
                 byte[] data = receivedData.ToArray();
                 receivedData.Clear();
+
+                byte[] hash = data.Take(16).ToArray();
+                data = data.Skip(16).ToArray();
+                byte[] newHash = SscpUtils.HashMD5(data);
+
+                if (!SscpUtils.CompareByteArrays(hash, newHash))
+                {
+                    await DisconnectAsync();
+                    return;
+                }
 
                 double packetNumber = BitConverter.ToDouble(data.Take(8).ToArray(), 0);
 

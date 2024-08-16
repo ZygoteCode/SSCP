@@ -1,7 +1,7 @@
 ﻿using System.Security.Cryptography;
 using System.Numerics;
 
-namespace SSCP
+namespace SSCP.Utils
 {
     internal class SscpRandom
     {

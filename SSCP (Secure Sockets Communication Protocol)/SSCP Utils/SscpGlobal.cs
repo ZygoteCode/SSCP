@@ -1,4 +1,4 @@
-﻿namespace SSCP
+﻿namespace SSCP.Utils
 {
     internal class SscpGlobal
     {

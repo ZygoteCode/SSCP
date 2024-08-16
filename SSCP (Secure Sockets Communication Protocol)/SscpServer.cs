@@ -2,6 +2,7 @@
 using System.Net.WebSockets;
 using System.Net;
 using System.Text;
+using SSCP.Utils;
 
 namespace SSCP
 {
@@ -13,7 +14,6 @@ namespace SSCP
         private ConcurrentDictionary<SscpServerUser, Task> _users = new ConcurrentDictionary<SscpServerUser, Task>();
         private HttpListener _httpListener;
 
-        private SscpRandom _sscpRandom = new SscpRandom(2);
         private char[] _characters = "abcdefghijklmnopqrstuvwxyz0123456789".ToCharArray();
 
         public SscpServer(ushort port = 9987)
@@ -166,11 +166,11 @@ namespace SSCP
 
         private string GenerateID()
         {
-            string generated = _sscpRandom.GetRandomString(_characters, 32);
+            string generated = SscpGlobal.SscpRandom.GetRandomString(_characters, 32);
 
             while (GetUserByID(generated) != null)
             {
-                generated = _sscpRandom.GetRandomString(_characters, 32);
+                generated = SscpGlobal.SscpRandom.GetRandomString(_characters, 32);
             }
 
             return generated;
@@ -201,6 +201,15 @@ namespace SSCP
                 byte[] data = receivedData.ToArray();
                 receivedData.Clear();
 
+                byte[] hash = data.Take(16).ToArray();
+                data = data.Skip(16).ToArray();
+                byte[] newHash = SscpUtils.HashMD5(data);
+
+                if (!SscpUtils.CompareByteArrays(hash, newHash))
+                {
+                    goto close;
+                }
+
                 double packetNumber = BitConverter.ToDouble(data.Take(8).ToArray(), 0);
 
                 if (packetNumber != sscpServerUser.PacketNumber)
@@ -226,6 +235,7 @@ namespace SSCP
                 }
 
                 data = data.Skip(8).ToArray();
+
                 sscpServerUser.PacketNumber = sscpServerUser.PacketNumber + SscpGlobal.PacketNumberIncremental;
 
                 if (sscpServerUser.PacketNumber >= SscpGlobal.MaxPacketNumber)

@@ -1,7 +1,7 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Net.WebSockets;
 using System.Text;
+using SSCP.Utils;
 
 namespace SSCP
 {
@@ -90,6 +90,9 @@ namespace SSCP
             }
 
             data = SscpUtils.Combine(BitConverter.GetBytes(ServerPacketNumber), packetId, BitConverter.GetBytes(SscpUtils.GetTimestamp()), data);
+            byte[] hash = SscpUtils.HashMD5(data);
+            data = SscpUtils.Combine(hash, data);
+            
             await _webSocket.SendAsync(new ArraySegment<byte>(data), WebSocketMessageType.Binary, true, CancellationToken.None);
             ServerPacketNumber += 0.0001;
 

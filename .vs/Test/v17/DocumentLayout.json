@@ -3,8 +3,8 @@
   "WorkspaceRootPath": "C:\\Users\\bolog\\Desktop\\SSCP\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{B0325139-FAEE-4EE1-8FC9-A6AB5F7FCCC4}|Test.csproj|c:\\users\\bolog\\desktop\\sscp\\sscp (secure sockets communication protocol)\\sscpserveruser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{B0325139-FAEE-4EE1-8FC9-A6AB5F7FCCC4}|Test.csproj|solutionrelative:sscp (secure sockets communication protocol)\\sscpserveruser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{B0325139-FAEE-4EE1-8FC9-A6AB5F7FCCC4}|Test.csproj|c:\\users\\bolog\\desktop\\sscp\\sscp (secure sockets communication protocol)\\sscpclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B0325139-FAEE-4EE1-8FC9-A6AB5F7FCCC4}|Test.csproj|solutionrelative:sscp (secure sockets communication protocol)\\sscpclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -19,14 +19,14 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "SscpServerUser.cs",
-              "DocumentMoniker": "C:\\Users\\bolog\\Desktop\\SSCP\\SSCP (Secure Sockets Communication Protocol)\\SscpServerUser.cs",
-              "RelativeDocumentMoniker": "SSCP (Secure Sockets Communication Protocol)\\SscpServerUser.cs",
-              "ToolTip": "C:\\Users\\bolog\\Desktop\\SSCP\\SSCP (Secure Sockets Communication Protocol)\\SscpServerUser.cs",
-              "RelativeToolTip": "SSCP (Secure Sockets Communication Protocol)\\SscpServerUser.cs",
-              "ViewState": "AgIAAE0AAAAAAAAAAADwvw8AAAAJAAAAAAAAAA==",
+              "Title": "SscpClient.cs",
+              "DocumentMoniker": "C:\\Users\\bolog\\Desktop\\SSCP\\SSCP (Secure Sockets Communication Protocol)\\SscpClient.cs",
+              "RelativeDocumentMoniker": "SSCP (Secure Sockets Communication Protocol)\\SscpClient.cs",
+              "ToolTip": "C:\\Users\\bolog\\Desktop\\SSCP\\SSCP (Secure Sockets Communication Protocol)\\SscpClient.cs",
+              "RelativeToolTip": "SSCP (Secure Sockets Communication Protocol)\\SscpClient.cs",
+              "ViewState": "AgIAAF8AAAAAAAAAAAAQwHkAAAAbAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-08-16T10:17:26.628Z",
+              "WhenOpened": "2024-08-16T10:22:44.37Z",
               "EditorCaption": ""
             }
           ]
