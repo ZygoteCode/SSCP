@@ -10,7 +10,7 @@ namespace SSCP
         private WebSocket _webSocket;
         private IPEndPoint _ipEndPoint;
         private string _id;
-        private double _packetNumber;
+        private double _packetNumber, _serverPacketNumber;
 
         public bool Connected
         {
@@ -65,6 +65,19 @@ namespace SSCP
             }
         }
 
+        public double ServerPacketNumber
+        {
+            get
+            {
+                return _serverPacketNumber;
+            }
+
+            set
+            {
+                _serverPacketNumber = value;
+            }
+        }
+
         public SscpServerUser(SscpServer server, WebSocket webSocket, IPEndPoint ipEndPoint, string id)
         {
             _server = server;
@@ -72,6 +85,7 @@ namespace SSCP
             _ipEndPoint = ipEndPoint;
             _id = id;
             _packetNumber = 0.0;
+            _serverPacketNumber = 0.0;
         }
 
         public void Dispose()
@@ -91,7 +105,14 @@ namespace SSCP
 
         public async Task SendAsync(byte[] data)
         {
+            data = SscpUtils.Combine(BitConverter.GetBytes(_serverPacketNumber), data);
             await _webSocket.SendAsync(new ArraySegment<byte>(data), WebSocketMessageType.Binary, true, CancellationToken.None);
+            _serverPacketNumber += 0.0001;
+
+            if (_serverPacketNumber >= 1000000000000)
+            {
+                _serverPacketNumber = 0.0;
+            }
         }
 
         public void Send(byte[] data)

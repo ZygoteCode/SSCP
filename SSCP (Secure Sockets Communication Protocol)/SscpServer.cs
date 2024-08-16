@@ -216,6 +216,8 @@ namespace SSCP
                 {
                     sscpServerUser.PacketNumber = 0.0;
                 }
+
+                Send(sscpServerUser, $"I respond you to the message!");
             }
 
             close: await KickAsync(sscpServerUser);
