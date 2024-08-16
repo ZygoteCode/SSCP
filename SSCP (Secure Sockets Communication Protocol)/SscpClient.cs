@@ -14,6 +14,7 @@ namespace SSCP
 
         private SscpRandom _random = new SscpRandom(2);
         private List<byte[]> _lastPacketIds = new List<byte[]>();
+        private List<byte[]> _serverPacketIds = new List<byte[]>();
 
         public SscpClient(string host, ushort port = 9987)
         {
@@ -117,11 +118,27 @@ namespace SSCP
                 }
 
                 data = data.Skip(8).ToArray();
+                byte[] packetId = data.Take(6).ToArray();
+
+                if (_serverPacketIds.Contains(packetId))
+                {
+                    await DisconnectAsync();
+                    return;
+                }
+
+                data = data.Skip(6).ToArray();
                 _serverPacketNumber = _serverPacketNumber + 0.0001;
 
                 if (_serverPacketNumber >= 1000000000000)
                 {
                     _serverPacketNumber = 0.0;
+                }
+
+                _serverPacketIds.Add(packetId);
+
+                if (_serverPacketIds.Count > 0)
+                {
+                    _serverPacketIds.Clear();
                 }
 
                 MessageReceived?.Invoke(data);

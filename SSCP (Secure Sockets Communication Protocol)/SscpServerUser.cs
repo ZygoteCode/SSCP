@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Net.WebSockets;
 using System.Text;
 
@@ -10,7 +11,6 @@ namespace SSCP
         private WebSocket _webSocket;
         private IPEndPoint _ipEndPoint;
         private string _id;
-        private double _packetNumber, _serverPacketNumber;
 
         public bool Connected
         {
@@ -51,6 +51,7 @@ namespace SSCP
         public double ServerPacketNumber { get; set; }
 
         public List<byte[]> PacketIds { get; set; }
+        public List<byte[]> ServerPacketIds { get; set; }
 
         public SscpServerUser(SscpServer server, WebSocket webSocket, IPEndPoint ipEndPoint, string id)
         {
@@ -61,6 +62,7 @@ namespace SSCP
             PacketNumber = 0.0;
             ServerPacketNumber = 0.0;
             PacketIds = new List<byte[]>();
+            ServerPacketIds = new List<byte[]>();
         }
 
         public void Dispose()
@@ -80,13 +82,27 @@ namespace SSCP
 
         public async Task SendAsync(byte[] data)
         {
-            data = SscpUtils.Combine(BitConverter.GetBytes(_serverPacketNumber), data);
-            await _webSocket.SendAsync(new ArraySegment<byte>(data), WebSocketMessageType.Binary, true, CancellationToken.None);
-            _serverPacketNumber += 0.0001;
+            byte[] packetId = SscpGlobal.SscpRandom.GetRandomByteArray(6);
 
-            if (_serverPacketNumber >= 1000000000000)
+            while (ServerPacketIds.Contains(packetId))
             {
-                _serverPacketNumber = 0.0;
+                packetId = SscpGlobal.SscpRandom.GetRandomByteArray(6);
+            }
+
+            data = SscpUtils.Combine(BitConverter.GetBytes(ServerPacketNumber), packetId, data);
+            await _webSocket.SendAsync(new ArraySegment<byte>(data), WebSocketMessageType.Binary, true, CancellationToken.None);
+            ServerPacketNumber += 0.0001;
+
+            if (ServerPacketNumber >= 1000000000000)
+            {
+                ServerPacketNumber = 0.0;
+            }
+
+            ServerPacketIds.Add(packetId);
+
+            if (ServerPacketIds.Count > 100)
+            {
+                ServerPacketIds.Clear();
             }
         }
 
