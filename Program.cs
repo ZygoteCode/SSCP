@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using SSCP;
+using System.Text;
 
 class Program
 {
@@ -32,7 +33,7 @@ class Program
 
     private static void _sscpServer_UserConnected(SscpServerUser obj)
     {
-        Console.WriteLine($"[SERVER] A new User has been connected (IP: {obj.ConnectionIpAddress}, Port: {obj.ConnectionPort}).");
+        Console.WriteLine($"[SERVER] A new User has been connected (IP: {obj.ConnectionIpAddress}, Port: {obj.ConnectionPort}, ID: {obj.ID}).");
     }
 
     private static void _sscpServer_UserDisconnected(SscpServerUser obj)
