@@ -209,7 +209,15 @@ namespace SSCP
                 }
 
                 data = data.Skip(8).ToArray();
-                MessageReceived?.Invoke(sscpServerUser, data);
+
+                byte[] packetId = data.Take(6).ToArray();
+                data = data.Skip(6).ToArray();
+
+                if (sscpServerUser.PacketIds.Contains(packetId))
+                {
+                    goto close;
+                }
+
                 sscpServerUser.PacketNumber = sscpServerUser.PacketNumber + 0.0001;
 
                 if (sscpServerUser.PacketNumber >= 1000000000000)
@@ -217,6 +225,14 @@ namespace SSCP
                     sscpServerUser.PacketNumber = 0.0;
                 }
 
+                sscpServerUser.PacketIds.Add(packetId);
+
+                if (sscpServerUser.PacketIds.Count > 100)
+                {
+                    sscpServerUser.PacketIds.Clear();
+                }
+
+                MessageReceived?.Invoke(sscpServerUser, data);
                 Send(sscpServerUser, $"I respond you to the message!");
             }
 

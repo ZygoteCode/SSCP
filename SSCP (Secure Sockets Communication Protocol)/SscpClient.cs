@@ -12,6 +12,9 @@ namespace SSCP
         private string _uri;
         private double _packetNumber, _serverPacketNumber;
 
+        private SscpRandom _random = new SscpRandom(2);
+        private List<byte[]> _lastPacketIds = new List<byte[]>();
+
         public SscpClient(string host, ushort port = 9987)
         {
             _uri = $"ws://{host}:{port}/SSCP/";
@@ -47,7 +50,21 @@ namespace SSCP
 
         public async Task SendAsync(byte[] data)
         {
-            data = SscpUtils.Combine(BitConverter.GetBytes(_packetNumber), data);
+            byte[] packetId = _random.GetRandomByteArray(6);
+
+            while (_lastPacketIds.Contains(packetId))
+            {
+                packetId = _random.GetRandomByteArray(6);
+            }
+
+            _lastPacketIds.Add(packetId);
+
+            if (_lastPacketIds.Count > 100)
+            {
+                _lastPacketIds.Clear();
+            }
+
+            data = SscpUtils.Combine(BitConverter.GetBytes(_packetNumber), packetId, data);
             await _client.SendAsync(new ArraySegment<byte>(data), WebSocketMessageType.Binary, true, CancellationToken.None);
             _packetNumber += 0.0001;
 

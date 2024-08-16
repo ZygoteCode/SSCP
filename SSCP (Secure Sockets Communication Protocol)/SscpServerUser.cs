@@ -44,48 +44,23 @@ namespace SSCP
             }
         }
 
-        public string ID
-        {
-            get
-            {
-                return _id;
-            }
-        }
+        public string ID { get; set; }
 
-        public double PacketNumber
-        {
-            get
-            {
-                return _packetNumber;
-            }
+        public double PacketNumber { get; set; }
 
-            set
-            {
-                _packetNumber = value;
-            }
-        }
+        public double ServerPacketNumber { get; set; }
 
-        public double ServerPacketNumber
-        {
-            get
-            {
-                return _serverPacketNumber;
-            }
-
-            set
-            {
-                _serverPacketNumber = value;
-            }
-        }
+        public List<byte[]> PacketIds { get; set; }
 
         public SscpServerUser(SscpServer server, WebSocket webSocket, IPEndPoint ipEndPoint, string id)
         {
             _server = server;
             _webSocket = webSocket;
             _ipEndPoint = ipEndPoint;
-            _id = id;
-            _packetNumber = 0.0;
-            _serverPacketNumber = 0.0;
+            ID = id;
+            PacketNumber = 0.0;
+            ServerPacketNumber = 0.0;
+            PacketIds = new List<byte[]>();
         }
 
         public void Dispose()
