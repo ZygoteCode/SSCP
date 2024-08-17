@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "TDMMbkx7w20=",
+  "dgSpecHash": "c7tzwXcN8Jc=",
   "success": true,
-  "projectFilePath": "C:\\Users\\bolog\\Desktop\\SSCP\\SSCP\\SscpTest\\SscpTest.csproj",
+  "projectFilePath": "C:\\Users\\bolog\\Desktop\\SSCP\\SscpTest\\SscpTest.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\bolog\\.nuget\\packages\\bouncycastle.cryptography\\2.4.0\\bouncycastle.cryptography.2.4.0.nupkg.sha512"
   ],

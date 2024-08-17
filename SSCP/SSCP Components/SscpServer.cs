@@ -99,6 +99,34 @@ namespace SSCP
             }
         }
 
+        public async Task BroadcastAsync(byte[] data)
+        {
+            foreach (SscpServerUser sscpServerUser in _users.Keys)
+            {
+                if (!sscpServerUser.HandshakeCompleted)
+                {
+                    continue;
+                }
+
+                await SendAsyncPrivate(sscpServerUser, data);
+            }
+        }
+
+        public async Task BroadcastAsync(string data)
+        {
+            await BroadcastAsync(Encoding.UTF8.GetBytes(data));
+        }
+
+        public void Broadcast(byte[] data)
+        {
+            BroadcastAsync(data).GetAwaiter().GetResult();
+        }
+
+        public void Broadcast(string data)
+        {
+            BroadcastAsync(data).GetAwaiter().GetResult();
+        }
+
         private async Task SendRSAKey(SscpServerUser sscpServerUser)
         {
             sscpServerUser.ToClientRSA = new System.Security.Cryptography.RSACryptoServiceProvider(SscpGlobal.RSA_KEY_LENGTH);
