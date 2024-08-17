@@ -24,3 +24,5 @@
   - [ ] (Teoric) WebSocket-HTTP request analyzer & filter, anti-spam for them
   - [ ] (Teoric) Introduce a new layer with UDP, for transfering less-useful informations (media content for example)
   - [ ] (Teoric) Anti DDoS feature (max packets in seconds/milliseconds, data patterns, strange IP addresses ranges in a span of time, ...)
+  - [ ] (Teoric) Custom Headers in HTTP request for WebSocket, by the Client and the Server, for validation
+  - [ ] (Teoric) Use Secret WebSocket Key for better encryption (?)
