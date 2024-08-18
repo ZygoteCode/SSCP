@@ -19,10 +19,10 @@
   - [ ] Custom reason (in bytes / string) on disconnect (client) and kick (server)
   - [ ] Reduce Server and Client load by optimizing the code (code size, number of instructions, use of correct collections, ...)
   - [ ] Allow better chunking for big datas (like images, videos, ...) - this can allow upload/download of files
+  - [ ] Implement a feature to ban IP addresses from the Server, by a list of IP addresses
   - [x] Add a feature for broadcasting message to all connected users
   - [x] WebSocket-HTTP request analyzer & filter (headers analysis)
   - [x] Use Secret WebSocket Key for better encryption
-  - [ ] Implement a feature to ban IP addresses from the Server, by a list of IP addresses
   - [ ] (Teoric) HWID (hashed) authentication system
   - [ ] (Teoric) Introduce a new layer with UDP, for transfering less-useful informations (media content for example)
   - [ ] (Teoric) Anti DDoS feature (max packets in seconds/milliseconds, data patterns, strange IP addresses ranges in a span of time, ...)
