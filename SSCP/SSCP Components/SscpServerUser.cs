@@ -60,8 +60,9 @@ namespace SSCP
         public byte[] AesKey { get; set; }
         public bool HandshakeCompleted { get; set; }
         public DateTime ConnectedSince { get; set; }
+        public byte[] SecretWebSocketKey { get; set; }
 
-        public SscpServerUser(SscpServer server, WebSocket webSocket, IPEndPoint ipEndPoint, string id)
+        public SscpServerUser(SscpServer server, WebSocket webSocket, IPEndPoint ipEndPoint, string id, byte[] secretWebSocketKey)
         {
             _server = server;
             _webSocket = webSocket;
@@ -72,6 +73,7 @@ namespace SSCP
             PacketIds = new List<byte[]>();
             ServerPacketIds = new List<byte[]>();
             HandshakeStep = 0;
+            SecretWebSocketKey = secretWebSocketKey;
         }
 
         public void Dispose()
@@ -114,7 +116,7 @@ namespace SSCP
 
             if (AesKey != null)
             {
-                data = SscpUtils.ProcessAES256(data, AesKey, new byte[16], true);
+                data = SscpUtils.ProcessAES256(data, AesKey, HandshakeStep == 4 ? SecretWebSocketKey : new byte[16], true);
                 byte[] theHash = SscpUtils.HashMD5(data);
                 data = SscpUtils.Combine(theHash, data);
             }

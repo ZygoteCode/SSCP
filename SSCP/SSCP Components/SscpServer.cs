@@ -78,9 +78,32 @@ namespace SSCP
                             }
                         }
 
+                        string secWebSocketKey = "";
+
+                        try
+                        {
+                            secWebSocketKey = context.Request.Headers[0]!;
+                            string secWebSocketVersion = context.Request.Headers[1]!,
+                                connection = context.Request.Headers[2]!,
+                                upgrade = context.Request.Headers[3]!;
+
+                            if (secWebSocketVersion != "13" || connection != "Upgrade" || upgrade != "websocket" || secWebSocketKey.Length != 24)
+                            {
+                                context.Response.StatusCode = 400;
+                                context.Response.Close();
+                                continue;
+                            }
+                        }
+                        catch
+                        {
+                            context.Response.StatusCode = 400;
+                            context.Response.Close();
+                            continue;
+                        }
+
                         HttpListenerWebSocketContext webSocketContext = await context.AcceptWebSocketAsync(null);
                         WebSocket webSocket = webSocketContext.WebSocket;
-                        SscpServerUser sscpServerUser = new SscpServerUser(this, webSocket, context.Request.RemoteEndPoint, GenerateID());
+                        SscpServerUser sscpServerUser = new SscpServerUser(this, webSocket, context.Request.RemoteEndPoint, GenerateID(), SscpUtils.GetKeyFromSecretWebSocketKey(secWebSocketKey));
                         Task userTask = Task.Run(() => HandleWebSocketCommunication(sscpServerUser));
                         _users.TryAdd(sscpServerUser, userTask);
                         sscpServerUser.HandshakeStep = 1;
@@ -313,7 +336,7 @@ namespace SSCP
                         goto close;
                     }
 
-                    data = SscpUtils.ProcessAES256(data, sscpServerUser.AesKey, new byte[16], false);
+                    data = SscpUtils.ProcessAES256(data, sscpServerUser.AesKey, sscpServerUser.HandshakeStep == 4 ? sscpServerUser.SecretWebSocketKey : new byte[16], false);
                 }
 
                 byte[] hash = data.Take(16).ToArray();
@@ -381,7 +404,7 @@ namespace SSCP
                         sscpServerUser.AesTempKey = null;
 
                         byte[] ipBytes = Encoding.UTF8.GetBytes(sscpServerUser.ConnectionIpAddress);
-                        byte[] toSend = SscpUtils.Combine(Encoding.UTF8.GetBytes(sscpServerUser.ID), BitConverter.GetBytes(ipBytes.Length), ipBytes, BitConverter.GetBytes(sscpServerUser.ConnectionPort));
+                        byte[] toSend = SscpUtils.Combine(Encoding.UTF8.GetBytes(sscpServerUser.ID), BitConverter.GetBytes(ipBytes.Length), ipBytes, BitConverter.GetBytes(sscpServerUser.ConnectionPort), sscpServerUser.SecretWebSocketKey);
                         await SendAsyncPrivate(sscpServerUser, toSend);
 
                         sscpServerUser.HandshakeStep = 4;

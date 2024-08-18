@@ -2,6 +2,8 @@
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Security;
 using System.Security.Cryptography;
+using System.Text;
+using Microsoft.VisualBasic;
 
 namespace SSCP.Utils
 {
@@ -61,6 +63,11 @@ namespace SSCP.Utils
             cipher.DoFinal(processed, len);
 
             return processed;
+        }
+
+        public static byte[] GetKeyFromSecretWebSocketKey(string secretWebSocketKey)
+        {
+            return HashMD5(Encoding.UTF8.GetBytes(secretWebSocketKey));
         }
     }
 }

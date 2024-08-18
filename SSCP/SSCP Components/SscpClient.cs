@@ -25,6 +25,7 @@ namespace SSCP
         private int _currentPort;
         private bool _handshakeCompleted;
         private DateTime _connectedSince;
+        private byte[] _secretWebSocketKey;
 
         public string ID
         {
@@ -75,6 +76,7 @@ namespace SSCP
         {
             _client = new ClientWebSocket();
             _packetNumber = _serverPacketNumber = 0.0;
+            _secretWebSocketKey = new byte[16];
             _handshakeStep = 0;
             _lastPacketIds.Clear();
             _serverPacketIds.Clear();
@@ -140,7 +142,7 @@ namespace SSCP
 
             if (_aesKey != null)
             {
-                data = SscpUtils.ProcessAES256(data, _aesKey, new byte[16], true);
+                data = SscpUtils.ProcessAES256(data, _aesKey, _secretWebSocketKey, true);
                 byte[] theHash = SscpUtils.HashMD5(data);
                 data = SscpUtils.Combine(theHash, data);
             }
@@ -200,7 +202,7 @@ namespace SSCP
                         return;
                     }
 
-                    data = SscpUtils.ProcessAES256(data, _aesKey, new byte[16], false);
+                    data = SscpUtils.ProcessAES256(data, _aesKey, _secretWebSocketKey, false);
                 }
 
                 byte[] hash = data.Take(16).ToArray();
@@ -284,7 +286,11 @@ namespace SSCP
                         data = data.Skip(ipLength).ToArray();
 
                         _currentPort = BitConverter.ToInt32(data.Take(4).ToArray());
+                        data = data.Skip(4).ToArray();
 
+                        _secretWebSocketKey = data.Take(16).ToArray();
+                        Console.WriteLine(_secretWebSocketKey.Length);
+                        
                         _handshakeStep = 4;
                         _handshakeCompleted = true;
                         _connectedSince = DateTime.UtcNow;
