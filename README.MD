@@ -26,4 +26,4 @@
   - [ ] (Teoric) HWID (hashed) authentication system
   - [ ] (Teoric) Introduce a new layer with UDP, for transfering less-useful informations (media content for example)
   - [ ] (Teoric) Anti DDoS feature (max packets in seconds/milliseconds, data patterns, strange IP addresses ranges in a span of time, ...)
-  - [N] (Teoric) Custom Headers in HTTP request for WebSocket, by the Client and the Server, for validation
+  - [✗] (Teoric) Custom Headers in HTTP request for WebSocket, by the Client and the Server, for validation
