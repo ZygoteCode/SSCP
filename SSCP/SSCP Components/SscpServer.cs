@@ -163,6 +163,21 @@ namespace SSCP
             }
         }
 
+        public void Ban(string ip)
+        {
+            BanAsync(ip).GetAwaiter().GetResult();
+        }
+
+        public async Task BanAsync(SscpServerUser sscpServerUser)
+        {
+            await BanAsync(sscpServerUser.ConnectionIpAddress);
+        }
+
+        public void Ban(SscpServerUser sscpServerUser)
+        {
+            BanAsync(sscpServerUser).GetAwaiter().GetResult();
+        }
+
         public async Task BroadcastAsync(byte[] data)
         {
             foreach (SscpServerUser sscpServerUser in _users.Keys)
