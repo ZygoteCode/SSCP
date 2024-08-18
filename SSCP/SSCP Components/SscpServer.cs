@@ -50,16 +50,20 @@ namespace SSCP
         }
 
         public int MaxUsers { get; set; }
+        public List<string> BannedIPs { get; }
 
         public SscpServer(ushort port = SscpGlobal.DEFAULT_PORT, int maxUsers = -1)
         {
             MaxUsers = maxUsers;
+            BannedIPs = new List<string>();
+
             _httpListener = new HttpListener();
             _httpListener.Prefixes.Add($"http://{SscpGlobal.DEFAULT_SERVER_IP}:{port}{SscpGlobal.DEFAULT_URL_SLUG}");
         }
 
         public async Task StartAsync()
         {
+            _users.Clear();
             _httpListener.Start();
 
             while (_httpListener.IsListening)
@@ -78,11 +82,26 @@ namespace SSCP
                             }
                         }
 
-                        string secWebSocketKey = "";
+                        if (BannedIPs.Contains(context.Request.RemoteEndPoint.Address.ToString()))
+                        {
+                            context.Response.StatusCode = 401;
+                            context.Response.Close();
+                            continue;
+                        }
 
+                        string secWebSocketKey = "";
+                        
                         try
                         {
+                            if (context.Request.Headers.AllKeys.Length != 5 || context.Request.Headers.AllKeys[0] != "Sec-WebSocket-Key" || context.Request.Headers.AllKeys[1] != "Sec-WebSocket-Version" || context.Request.Headers.AllKeys[2] != "Connection" || context.Request.Headers.AllKeys[3] != "Upgrade" || context.Request.Headers.AllKeys[4] != "Host")
+                            {
+                                context.Response.StatusCode = 400;
+                                context.Response.Close();
+                                continue;
+                            }
+
                             secWebSocketKey = context.Request.Headers[0]!;
+
                             string secWebSocketVersion = context.Request.Headers[1]!,
                                 connection = context.Request.Headers[2]!,
                                 upgrade = context.Request.Headers[3]!;
@@ -118,6 +137,28 @@ namespace SSCP
                 catch
                 {
 
+                }
+            }
+        }
+
+        public async Task BanAsync(string ip)
+        {
+            BannedIPs.Add(ip);
+
+            foreach (SscpServerUser sscpServerUser in _users.Keys)
+            {
+                if (!sscpServerUser.HandshakeCompleted)
+                {
+                    continue;
+                }
+
+                if (sscpServerUser.ConnectionIpAddress.Equals(ip))
+                {
+                    _users.TryRemove(sscpServerUser, out _);
+                    UserDisconnected?.Invoke(sscpServerUser);
+                    await sscpServerUser.KickAsync();
+                    sscpServerUser.Dispose();
+                    UserKicked?.Invoke(sscpServerUser);
                 }
             }
         }
