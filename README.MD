@@ -10,7 +10,8 @@
   - [ ] Official explanation of the protocol
 
 - [ ] **Features:**
-  - [ ] Update the Unique ID generation system: concatenate the randomly generated unique ID, and the Secret WebSocket Key hash obtained in the Server, and get the MD5 hash of this concatenation
+  - [ ] Update the Unique ID generation system: concatenate the randomly generated unique ID, and the Secret WebSocket Key hash obtained in the Server, and get the MD5 hash of this concatenation. Also, the current timestamp can be concatenated for security reasons
+  - [ ] A new method for generating Packet IDs: concatenate the random generated string, and the current timestamp, and hash all with MD5
   - [ ] Error handling to prevent lose data, lose connections, or temporary downtimes
   - [ ] Periodic exchange of new AES keys (complete and partial)
   - [ ] Better use of hashing algorithms (like SHA-512 or Keccak)
