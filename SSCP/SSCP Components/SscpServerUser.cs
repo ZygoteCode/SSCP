@@ -106,13 +106,13 @@ namespace SSCP
             byte[] packetId = SscpUtils.GeneratePacketID();
 
             data = SscpUtils.Combine(BitConverter.GetBytes(ServerPacketNumber), packetId, BitConverter.GetBytes(SscpUtils.GetTimestamp()), data);
-            byte[] hash = SscpUtils.HashMD5(data);
+            byte[] hash = SscpUtils.HashKeccak256(data);
             data = SscpUtils.Combine(hash, data);
 
             if (AesKey != null)
             {
                 data = SscpUtils.ProcessAES256(data, AesKey, HandshakeStep == 4 ? SecretWebSocketKey : new byte[16], true);
-                byte[] theHash = SscpUtils.HashMD5(data);
+                byte[] theHash = SscpUtils.HashKeccak256(data);
                 data = SscpUtils.Combine(theHash, data);
             }
 

@@ -3,6 +3,7 @@ using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Security;
 using System.Security.Cryptography;
 using System.Text;
+using Org.BouncyCastle.Crypto.Digests;
 
 namespace SSCP.Utils
 {
@@ -30,6 +31,15 @@ namespace SSCP.Utils
         public static byte[] HashMD5(byte[] data)
         {
             return MD5.Create().ComputeHash(data);
+        }
+
+        public static byte[] HashKeccak256(byte[] data)
+        {
+            KeccakDigest digest = new KeccakDigest(256);
+            digest.BlockUpdate(data, 0, data.Length);
+            byte[] result = new byte[digest.GetDigestSize()];
+            digest.DoFinal(result, 0);
+            return result;
         }
 
         public static bool CompareByteArrays(byte[] first, byte[] second)
@@ -71,12 +81,12 @@ namespace SSCP.Utils
 
         public static byte[] GeneratePacketID()
         {
-            return HashMD5(Combine(SscpGlobal.SscpRandom.GetRandomByteArray(SscpGlobal.PACKET_ID_SIZE), BitConverter.GetBytes(GetTimestamp())));
+            return HashKeccak256(Combine(SscpGlobal.SscpRandom.GetRandomByteArray(SscpGlobal.PACKET_ID_SIZE), BitConverter.GetBytes(GetTimestamp())));
         }
 
         public static string GenerateUserID(string ipAddress, int port, byte[] secretWebSocketKey)
         {
-            return Convert.ToHexString(HashMD5(Combine(Encoding.UTF8.GetBytes(ipAddress), BitConverter.GetBytes(port), secretWebSocketKey, SscpGlobal.SscpRandom.GetRandomBytes(32), BitConverter.GetBytes(GetTimestamp())))).ToLower();
+            return Convert.ToHexString(HashKeccak256(Combine(Encoding.UTF8.GetBytes(ipAddress), BitConverter.GetBytes(port), secretWebSocketKey, SscpGlobal.SscpRandom.GetRandomBytes(32), BitConverter.GetBytes(GetTimestamp())))).ToLower();
         }
     }
 }

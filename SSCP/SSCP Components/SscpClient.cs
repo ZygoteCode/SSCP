@@ -123,13 +123,13 @@ namespace SSCP
             byte[] packetId = SscpUtils.GeneratePacketID();
 
             data = SscpUtils.Combine(BitConverter.GetBytes(_packetNumber), packetId, BitConverter.GetBytes(SscpUtils.GetTimestamp()), data);
-            byte[] hash = SscpUtils.HashMD5(data);
+            byte[] hash = SscpUtils.HashKeccak256(data);
             data = SscpUtils.Combine(hash, data);
 
             if (_aesKey != null)
             {
                 data = SscpUtils.ProcessAES256(data, _aesKey, _secretWebSocketKey, true);
-                byte[] theHash = SscpUtils.HashMD5(data);
+                byte[] theHash = SscpUtils.HashKeccak256(data);
                 data = SscpUtils.Combine(theHash, data);
             }
 
@@ -178,9 +178,9 @@ namespace SSCP
 
                 if (_aesKey != null)
                 {
-                    byte[] theHash = data.Take(16).ToArray();
-                    data = data.Skip(16).ToArray();
-                    byte[] theNewHash = SscpUtils.HashMD5(data);
+                    byte[] theHash = data.Take(32).ToArray();
+                    data = data.Skip(32).ToArray();
+                    byte[] theNewHash = SscpUtils.HashKeccak256(data);
 
                     if (!SscpUtils.CompareByteArrays(theHash, theNewHash))
                     {
@@ -191,9 +191,9 @@ namespace SSCP
                     data = SscpUtils.ProcessAES256(data, _aesKey, _secretWebSocketKey, false);
                 }
 
-                byte[] hash = data.Take(16).ToArray();
-                data = data.Skip(16).ToArray();
-                byte[] newHash = SscpUtils.HashMD5(data);
+                byte[] hash = data.Take(32).ToArray();
+                data = data.Skip(32).ToArray();
+                byte[] newHash = SscpUtils.HashKeccak256(data);
 
                 if (!SscpUtils.CompareByteArrays(hash, newHash))
                 {
@@ -210,7 +210,7 @@ namespace SSCP
                 }
 
                 data = data.Skip(8).ToArray();
-                byte[] packetId = data.Take(16).ToArray();
+                byte[] packetId = data.Take(32).ToArray();
 
                 if (_serverPacketIds.ContainsByteArray(packetId))
                 {
@@ -218,7 +218,7 @@ namespace SSCP
                     return;
                 }
 
-                data = data.Skip(16).ToArray();
+                data = data.Skip(32).ToArray();
                 long timestamp = BitConverter.ToInt64(data.Take(8).ToArray());
 
                 if (SscpUtils.GetTimestamp() - timestamp > SscpGlobal.MAX_TIMESTAMP_DELAY)
@@ -262,8 +262,8 @@ namespace SSCP
                         _handshakeStep = 3;
                         break;
                     case 3:
-                        _currentId = Encoding.UTF8.GetString(data.Take(32).ToArray());
-                        data = data.Skip(32).ToArray();
+                        _currentId = Encoding.UTF8.GetString(data.Take(64).ToArray());
+                        data = data.Skip(64).ToArray();
 
                         int ipLength = BitConverter.ToInt32(data.Take(4).ToArray());
                         data = data.Skip(4).ToArray();

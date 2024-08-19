@@ -389,9 +389,9 @@ namespace SSCP
 
                 if (sscpServerUser.AesKey != null)
                 {
-                    byte[] theHash = data.Take(16).ToArray();
-                    data = data.Skip(16).ToArray();
-                    byte[] theNewHash = SscpUtils.HashMD5(data);
+                    byte[] theHash = data.Take(32).ToArray();
+                    data = data.Skip(32).ToArray();
+                    byte[] theNewHash = SscpUtils.HashKeccak256(data);
 
                     if (!SscpUtils.CompareByteArrays(theHash, theNewHash))
                     {
@@ -401,9 +401,9 @@ namespace SSCP
                     data = SscpUtils.ProcessAES256(data, sscpServerUser.AesKey, sscpServerUser.HandshakeStep == 4 ? sscpServerUser.SecretWebSocketKey : new byte[16], false);
                 }
 
-                byte[] hash = data.Take(16).ToArray();
-                data = data.Skip(16).ToArray();
-                byte[] newHash = SscpUtils.HashMD5(data);
+                byte[] hash = data.Take(32).ToArray();
+                data = data.Skip(32).ToArray();
+                byte[] newHash = SscpUtils.HashKeccak256(data);
 
                 if (!SscpUtils.CompareByteArrays(hash, newHash))
                 {
@@ -419,8 +419,8 @@ namespace SSCP
 
                 data = data.Skip(8).ToArray();
 
-                byte[] packetId = data.Take(16).ToArray();
-                data = data.Skip(16).ToArray();
+                byte[] packetId = data.Take(32).ToArray();
+                data = data.Skip(32).ToArray();
 
                 if (sscpServerUser.PacketIds.ContainsByteArray(packetId))
                 {
