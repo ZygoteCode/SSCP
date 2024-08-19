@@ -31,5 +31,7 @@
   - [ ] (Teoric) HWID (hashed) authentication system
   - [ ] (Teoric) Introduce a new layer with UDP, for transfering less-useful informations (media content for example)
   - [ ] (Teoric) Anti DDoS feature (max packets in seconds/milliseconds, data patterns, strange IP addresses ranges in a span of time, ...)
+
+## Discarded Ideas
   - [ ] ~~(Teoric) Custom Headers in HTTP request for WebSocket, by the Client and the Server, for validation~~
   - [ ] ~~Implement a new step in the Handshake, similar to the Sec-WebSocket-Key (https://stackoverflow.com/questions/18265128/what-is-sec-websocket-key-for)~~
