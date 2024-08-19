@@ -10,16 +10,7 @@
   - [ ] Complete tests
   - [ ] Official explanation of the protocol
 
-- [ ] **Features (V3 release):**
-  - [x] Update the Unique ID generation system: concatenate the randomly generated unique ID, and the Secret WebSocket Key hash obtained in the Server, and get the MD5 hash of this concatenation. Also, the current timestamp can be concatenated for security reasons
-  - [x] A new method for generating Packet IDs: concatenate the random generated string, and the current timestamp, and hash all with MD5
-  - [x] Implement a feature to ban IP addresses from the Server, by a list of IP addresses
-  - [x] Add a feature for broadcasting message to all connected users
-  - [x] WebSocket-HTTP request analyzer & filter (headers analysis)
-  - [x] Use Secret WebSocket Key for better encryption
-  - [x] Better use of hashing algorithms (increase from MD5 which is poor 16 bytes to heavy 32 bytes of SHA-256 / Keccak256 - https://github.com/GabryB03/SimpleHashing/blob/main/Hashing/SHA3/Keccak/Keccak256.cs)
-
-- [ ] **Features (future):**
+- [ ] **Features (V4?):**
   - [ ] Error handling to prevent lose data, lose connections, or temporary downtimes
   - [ ] Periodic exchange of new AES keys (complete and partial)
   - [ ] Establishing rules between Server and Client (max packet size, max users dynamically, max delay, ...)
