@@ -155,10 +155,19 @@ namespace SSCP
                 if (sscpServerUser.ConnectionIpAddress.Equals(ip))
                 {
                     _users.TryRemove(sscpServerUser, out _);
-                    UserDisconnected?.Invoke(sscpServerUser);
+                    
+                    if (sscpServerUser.HandshakeCompleted)
+                    {
+                        UserDisconnected?.Invoke(sscpServerUser);
+                    }
+
                     await sscpServerUser.KickAsync();
                     sscpServerUser.Dispose();
-                    UserKicked?.Invoke(sscpServerUser);
+                    
+                    if (sscpServerUser.HandshakeCompleted)
+                    {
+                        UserKicked?.Invoke(sscpServerUser);
+                    }
                 }
             }
         }
@@ -280,10 +289,19 @@ namespace SSCP
         private async Task KickAsyncPrivate(SscpServerUser sscpServerUser)
         {
             _users.TryRemove(sscpServerUser, out _);
-            UserDisconnected?.Invoke(sscpServerUser);
+            
+            if (sscpServerUser.HandshakeCompleted)
+            {
+                UserDisconnected?.Invoke(sscpServerUser);
+            }
+
             await sscpServerUser.KickAsync();
             sscpServerUser.Dispose();
-            UserKicked?.Invoke(sscpServerUser);
+            
+            if (sscpServerUser.HandshakeCompleted)
+            {
+                UserKicked?.Invoke(sscpServerUser);
+            }
         }
 
         public async Task KickAsync(SscpServerUser sscpServerUser)
@@ -413,10 +431,10 @@ namespace SSCP
 
                 data = data.Skip(8).ToArray();
 
-                byte[] packetId = data.Take(SscpGlobal.PACKET_ID_SIZE).ToArray();
-                data = data.Skip(SscpGlobal.PACKET_ID_SIZE).ToArray();
+                byte[] packetId = data.Take(16).ToArray();
+                data = data.Skip(16).ToArray();
 
-                if (sscpServerUser.PacketIds.Contains(packetId))
+                if (sscpServerUser.PacketIds.ContainsByteArray(packetId))
                 {
                     goto close;
                 }

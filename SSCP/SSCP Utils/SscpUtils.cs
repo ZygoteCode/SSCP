@@ -69,5 +69,10 @@ namespace SSCP.Utils
         {
             return HashMD5(Encoding.UTF8.GetBytes(secretWebSocketKey));
         }
+
+        public static byte[] GeneratePacketID()
+        {
+            return HashMD5(Combine(SscpGlobal.SscpRandom.GetRandomByteArray(SscpGlobal.PACKET_ID_SIZE), BitConverter.GetBytes(GetTimestamp())));
+        }
     }
 }

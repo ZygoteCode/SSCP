@@ -103,12 +103,7 @@ namespace SSCP
 
         public async Task SendAsync(byte[] data)
         {
-            byte[] packetId = SscpGlobal.SscpRandom.GetRandomByteArray(SscpGlobal.PACKET_ID_SIZE);
-
-            while (ServerPacketIds.Contains(packetId))
-            {
-                packetId = SscpGlobal.SscpRandom.GetRandomByteArray(SscpGlobal.PACKET_ID_SIZE);
-            }
+            byte[] packetId = SscpUtils.GeneratePacketID();
 
             data = SscpUtils.Combine(BitConverter.GetBytes(ServerPacketNumber), packetId, BitConverter.GetBytes(SscpUtils.GetTimestamp()), data);
             byte[] hash = SscpUtils.HashMD5(data);

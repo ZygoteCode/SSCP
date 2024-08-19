@@ -16,7 +16,6 @@ namespace SSCP
         private byte _handshakeStep;
         private RSACryptoServiceProvider _fromServerRSA, _toServerRSA;
 
-        private List<byte[]> _lastPacketIds = new List<byte[]>();
         private List<byte[]> _serverPacketIds = new List<byte[]>();
 
         private byte[] _aesKey;
@@ -78,7 +77,6 @@ namespace SSCP
             _packetNumber = _serverPacketNumber = 0.0;
             _secretWebSocketKey = new byte[16];
             _handshakeStep = 0;
-            _lastPacketIds.Clear();
             _serverPacketIds.Clear();
             await _client.ConnectAsync(new Uri(_uri), CancellationToken.None);
             _handshakeStep = 1;
@@ -122,19 +120,7 @@ namespace SSCP
 
         private async Task SendAsyncPrivate(byte[] data)
         {
-            byte[] packetId = SscpGlobal.SscpRandom.GetRandomByteArray(SscpGlobal.PACKET_ID_SIZE);
-
-            while (_lastPacketIds.Contains(packetId))
-            {
-                packetId = SscpGlobal.SscpRandom.GetRandomByteArray(SscpGlobal.PACKET_ID_SIZE);
-            }
-
-            _lastPacketIds.Add(packetId);
-
-            if (_lastPacketIds.Count > SscpGlobal.PACKET_ID_MAX_COUNT)
-            {
-                _lastPacketIds.Clear();
-            }
+            byte[] packetId = SscpUtils.GeneratePacketID();
 
             data = SscpUtils.Combine(BitConverter.GetBytes(_packetNumber), packetId, BitConverter.GetBytes(SscpUtils.GetTimestamp()), data);
             byte[] hash = SscpUtils.HashMD5(data);
@@ -224,15 +210,15 @@ namespace SSCP
                 }
 
                 data = data.Skip(8).ToArray();
-                byte[] packetId = data.Take(SscpGlobal.PACKET_ID_SIZE).ToArray();
+                byte[] packetId = data.Take(16).ToArray();
 
-                if (_serverPacketIds.Contains(packetId))
+                if (_serverPacketIds.ContainsByteArray(packetId))
                 {
                     await DisconnectAsync();
                     return;
                 }
 
-                data = data.Skip(SscpGlobal.PACKET_ID_SIZE).ToArray();
+                data = data.Skip(16).ToArray();
                 long timestamp = BitConverter.ToInt64(data.Take(8).ToArray());
 
                 if (SscpUtils.GetTimestamp() - timestamp > SscpGlobal.MAX_TIMESTAMP_DELAY)
