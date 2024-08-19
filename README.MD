@@ -17,7 +17,7 @@
   - [x] Add a feature for broadcasting message to all connected users
   - [x] WebSocket-HTTP request analyzer & filter (headers analysis)
   - [x] Use Secret WebSocket Key for better encryption
-  - [ ] Better use of hashing algorithms (like SHA-512 or Keccak)
+  - [ ] Better use of hashing algorithms (increase from MD5 which is poor 16 bytes to heavy 32 bytes of SHA-256 / Keccak256 - https://github.com/GabryB03/SimpleHashing/blob/main/Hashing/SHA3/Keccak/Keccak256.cs)
 
 - [ ] **Features (future):**
   - [ ] Error handling to prevent lose data, lose connections, or temporary downtimes
