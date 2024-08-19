@@ -14,7 +14,6 @@ namespace SSCP
         private ConcurrentDictionary<SscpServerUser, Task> _users = new ConcurrentDictionary<SscpServerUser, Task>();
         private HttpListener _httpListener;
 
-        private char[] _characters = "abcdefghijklmnopqrstuvwxyz0123456789".ToCharArray();
         private DateTime _startedSince;
 
         public DateTime StartedSince
@@ -122,7 +121,8 @@ namespace SSCP
 
                         HttpListenerWebSocketContext webSocketContext = await context.AcceptWebSocketAsync(null);
                         WebSocket webSocket = webSocketContext.WebSocket;
-                        SscpServerUser sscpServerUser = new SscpServerUser(this, webSocket, context.Request.RemoteEndPoint, GenerateID(), SscpUtils.GetKeyFromSecretWebSocketKey(secWebSocketKey));
+                        byte[] newSecretWebSocketKey = SscpUtils.GetKeyFromSecretWebSocketKey(secWebSocketKey);
+                        SscpServerUser sscpServerUser = new SscpServerUser(this, webSocket, context.Request.RemoteEndPoint, SscpUtils.GenerateUserID(context.Request.RemoteEndPoint.Address.ToString(), context.Request.RemoteEndPoint.Port, newSecretWebSocketKey), SscpUtils.GetKeyFromSecretWebSocketKey(secWebSocketKey));
                         Task userTask = Task.Run(() => HandleWebSocketCommunication(sscpServerUser));
                         _users.TryAdd(sscpServerUser, userTask);
                         sscpServerUser.HandshakeStep = 1;
@@ -360,18 +360,6 @@ namespace SSCP
         public void Send(string id, string data)
         {
             SendAsync(id, data).GetAwaiter().GetResult();
-        }
-
-        private string GenerateID()
-        {
-            string generated = SscpGlobal.SscpRandom.GetRandomString(_characters, 32);
-
-            while (GetUserByID(generated) != null)
-            {
-                generated = SscpGlobal.SscpRandom.GetRandomString(_characters, 32);
-            }
-
-            return generated;
         }
 
         private async Task HandleWebSocketCommunication(SscpServerUser sscpServerUser)

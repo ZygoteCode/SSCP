@@ -3,7 +3,6 @@ using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Security;
 using System.Security.Cryptography;
 using System.Text;
-using Microsoft.VisualBasic;
 
 namespace SSCP.Utils
 {
@@ -73,6 +72,11 @@ namespace SSCP.Utils
         public static byte[] GeneratePacketID()
         {
             return HashMD5(Combine(SscpGlobal.SscpRandom.GetRandomByteArray(SscpGlobal.PACKET_ID_SIZE), BitConverter.GetBytes(GetTimestamp())));
+        }
+
+        public static string GenerateUserID(string ipAddress, int port, byte[] secretWebSocketKey)
+        {
+            return Convert.ToHexString(HashMD5(Combine(Encoding.UTF8.GetBytes(ipAddress), BitConverter.GetBytes(port), secretWebSocketKey, SscpGlobal.SscpRandom.GetRandomBytes(32), BitConverter.GetBytes(GetTimestamp())))).ToLower();
         }
     }
 }

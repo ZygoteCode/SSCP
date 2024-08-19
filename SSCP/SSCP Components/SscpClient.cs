@@ -275,7 +275,6 @@ namespace SSCP
                         data = data.Skip(4).ToArray();
 
                         _secretWebSocketKey = data.Take(16).ToArray();
-                        Console.WriteLine(_secretWebSocketKey.Length);
                         
                         _handshakeStep = 4;
                         _handshakeCompleted = true;
