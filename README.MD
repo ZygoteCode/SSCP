@@ -4,6 +4,7 @@
 
 - [ ] **High Priority:**
 
+  - [ ] Implement all SscpClient's features in JavaScript client-side for browsers
   - [ ] Documentation
   - [ ] User guide
   - [ ] Complete tests
