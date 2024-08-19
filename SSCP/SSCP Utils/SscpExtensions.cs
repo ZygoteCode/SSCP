@@ -1,6 +1,6 @@
 ﻿using SSCP.Utils;
 
-public static class SscpExtensions
+internal static class SscpExtensions
 {
     public static bool ContainsByteArray(this List<byte[]> list, byte[] toCompare)
     {
