@@ -11,6 +11,7 @@
   - [ ] Official explanation of the protocol
 
 - [ ] **Features (V4?):**
+  - [ ] Implement (optional or forced?) compression of packets with following one(s) algorithms: GZip, Deflate, Brotli, LZMA, Zlib, Zip, BZip2, LZip - we can choose one of them based on the compression speed and the ratio - https://github.com/GabryB03/SimpleCompression/blob/main/SimpleCompression.cs
   - [ ] Error handling to prevent lose data, lose connections, or temporary downtimes
   - [ ] Periodic exchange of new AES keys (complete and partial)
   - [ ] Establishing rules between Server and Client (max packet size, max users dynamically, max delay, ...)
@@ -19,8 +20,8 @@
   - [ ] Custom reason (in bytes / string) on disconnect (client) and kick (server)
   - [ ] Reduce Server and Client load by optimizing the code (code size, number of instructions, use of correct collections, ...)
   - [ ] Allow better chunking for big datas (like images, videos, ...) - this can allow upload/download of files
-  - [ ] (Teoric) Introduce a new layer with UDP, for transfering less-useful informations (media content for example)
-  - [ ] (Teoric) Anti DDoS feature (max packets in seconds/milliseconds, data patterns, strange IP addresses ranges in a span of time, ...)
+  - [ ] Introduce a new layer with UDP, for transfering less-useful informations (media content for example)
+  - [ ] Anti DDoS feature (max packets in seconds/milliseconds, data patterns, strange IP addresses ranges in a span of time, ...)
 
 ## Discarded Ideas
   - [ ] ~~(Teoric) Custom Headers in HTTP request for WebSocket, by the Client and the Server, for validation~~
