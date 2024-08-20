@@ -25,7 +25,7 @@
   - [ ] Reduce Server and Client load by optimizing the code (code size, number of instructions, use of correct collections, ...)
   - [ ] Allow better chunking for big datas (like images, videos, ...) - this can allow upload/download of files
   - [ ] Introduce a new layer with UDP, for transfering less-useful informations (media content for example)
-  - [ ] Anti DDoS feature (max packets in seconds/milliseconds, data patterns, strange IP addresses ranges in a span of time, ...)
+  - [ ] Anti DDoS feature (max packets in seconds/milliseconds, data patterns, strange IP addresses ranges in a span of time, anti HTTP requests spam, ...)
 
 ## Discarded Ideas
   - [ ] ~~(Teoric) Custom Headers in HTTP request for WebSocket, by the Client and the Server, for validation~~
