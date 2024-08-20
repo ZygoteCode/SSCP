@@ -15,7 +15,7 @@
   - [ ] Error handling to prevent lose data, lose connections, or temporary downtimes
   - [ ] Periodic exchange of new AES keys (complete and partial)
   - [ ] Establishing rules between Server and Client (max packet size, max users dynamically, max delay, ...)
-  - [ ] Introduce custom packets with a custom "Protocol" (handshake, keep-alive, update AES key, first-second part of AES key update, re-handshake, disconnect, ...)
+  - [ ] Introduce custom packets with a custom "Protocol" (handshake, keep-alive, update AES key, first-second part of AES key update, re-handshake, disconnect, normal message with data, ...)
   - [ ] Better security with HTTPS (SSL & TLS), support of certificates
   - [ ] Custom reason (in bytes / string) on disconnect (client) and kick (server)
   - [ ] Reduce Server and Client load by optimizing the code (code size, number of instructions, use of correct collections, ...)
