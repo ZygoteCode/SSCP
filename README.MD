@@ -10,14 +10,16 @@
   - [ ] Complete tests
   - [ ] Official explanation of the protocol
 
-- [ ] **Features (V4?):**
+- [ ] **Features (release V4):**
   - [ ] Implement (optional or forced?) compression of packets with following one(s) algorithms: GZip, Deflate, Brotli, LZMA, Zlib, Zip, BZip2, LZip - we can choose one of them based on the compression speed and the ratio - https://github.com/GabryB03/SimpleCompression/blob/main/SimpleCompression.cs - (Zlib or Brotli?)
-  - [ ] Error handling to prevent lose data, lose connections, or temporary downtimes
-  - [ ] Periodic exchange of new AES keys (complete and partial)
-  - [ ] Establishing rules between Server and Client (max packet size, max users dynamically, max delay, ...)
   - [ ] Introduce custom packets with a custom "Protocol" (handshake, keep-alive, update AES key, first-second part of AES key update, re-handshake, disconnect, normal message with data, ...)
-  - [ ] Better security with HTTPS (SSL & TLS), support of certificates
+  - [ ] Periodic exchange of new AES keys (complete and partial)
   - [ ] Custom reason (in bytes / string) on disconnect (client) and kick (server)
+  - [ ] Establishing rules between Server and Client (max packet size, max users dynamically, max delay, ...)
+
+- [ ] **Features (in the near future):**
+  - [ ] Error handling to prevent lose data, lose connections, or temporary downtimes
+  - [ ] Better security with HTTPS (SSL & TLS), support of certificates
   - [ ] Reduce Server and Client load by optimizing the code (code size, number of instructions, use of correct collections, ...)
   - [ ] Allow better chunking for big datas (like images, videos, ...) - this can allow upload/download of files
   - [ ] Introduce a new layer with UDP, for transfering less-useful informations (media content for example)
