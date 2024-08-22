@@ -28,18 +28,23 @@ namespace SSCP.Utils
             return DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         }
 
-        public static byte[] HashMD5(byte[] data)
+        private static byte[] HashWithKeccak(byte[] data, int digestSize)
         {
-            return MD5.Create().ComputeHash(data);
-        }
-
-        public static byte[] HashKeccak256(byte[] data)
-        {
-            KeccakDigest digest = new KeccakDigest(256);
+            KeccakDigest digest = new KeccakDigest(digestSize);
             digest.BlockUpdate(data, 0, data.Length);
             byte[] result = new byte[digest.GetDigestSize()];
             digest.DoFinal(result, 0);
             return result;
+        }
+
+        private static byte[] HashWithKeccak128(byte[] data)
+        {
+            return HashWithKeccak(data, 128);
+        }
+
+        public static byte[] HashWithKeccak256(byte[] data)
+        {
+            return HashWithKeccak(data, 256);
         }
 
         public static bool CompareByteArrays(byte[] first, byte[] second)
@@ -76,17 +81,17 @@ namespace SSCP.Utils
 
         public static byte[] GetKeyFromSecretWebSocketKey(string secretWebSocketKey)
         {
-            return HashMD5(Encoding.UTF8.GetBytes(secretWebSocketKey));
+            return HashWithKeccak128(Encoding.UTF8.GetBytes(secretWebSocketKey));
         }
 
         public static byte[] GeneratePacketID()
         {
-            return HashKeccak256(Combine(SscpGlobal.SscpRandom.GetRandomByteArray(SscpGlobal.PACKET_ID_SIZE), BitConverter.GetBytes(GetTimestamp())));
+            return HashWithKeccak256(Combine(SscpGlobal.SscpRandom.GetRandomByteArray(SscpGlobal.PACKET_ID_SIZE), BitConverter.GetBytes(GetTimestamp())));
         }
 
         public static string GenerateUserID(string ipAddress, int port, byte[] secretWebSocketKey)
         {
-            return Convert.ToHexString(HashKeccak256(Combine(Encoding.UTF8.GetBytes(ipAddress), BitConverter.GetBytes(port), secretWebSocketKey, SscpGlobal.SscpRandom.GetRandomBytes(32), BitConverter.GetBytes(GetTimestamp())))).ToLower();
+            return Convert.ToHexString(HashWithKeccak256(Combine(Encoding.UTF8.GetBytes(ipAddress), BitConverter.GetBytes(port), secretWebSocketKey, SscpGlobal.SscpRandom.GetRandomBytes(32), BitConverter.GetBytes(GetTimestamp())))).ToLower();
         }
     }
 }

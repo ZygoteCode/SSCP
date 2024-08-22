@@ -391,7 +391,7 @@ namespace SSCP
                 {
                     byte[] theHash = data.Take(SscpGlobal.HASH_SIZE).ToArray();
                     data = data.Skip(SscpGlobal.HASH_SIZE).ToArray();
-                    byte[] theNewHash = SscpUtils.HashKeccak256(data);
+                    byte[] theNewHash = SscpUtils.HashWithKeccak256(data);
 
                     if (!SscpUtils.CompareByteArrays(theHash, theNewHash))
                     {
@@ -403,7 +403,7 @@ namespace SSCP
 
                 byte[] hash = data.Take(SscpGlobal.HASH_SIZE).ToArray();
                 data = data.Skip(SscpGlobal.HASH_SIZE).ToArray();
-                byte[] newHash = SscpUtils.HashKeccak256(data);
+                byte[] newHash = SscpUtils.HashWithKeccak256(data);
 
                 if (!SscpUtils.CompareByteArrays(hash, newHash))
                 {

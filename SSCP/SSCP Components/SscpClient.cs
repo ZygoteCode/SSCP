@@ -123,13 +123,13 @@ namespace SSCP
             byte[] packetId = SscpUtils.GeneratePacketID();
 
             data = SscpUtils.Combine(BitConverter.GetBytes(_packetNumber), packetId, BitConverter.GetBytes(SscpUtils.GetTimestamp()), data);
-            byte[] hash = SscpUtils.HashKeccak256(data);
+            byte[] hash = SscpUtils.HashWithKeccak256(data);
             data = SscpUtils.Combine(hash, data);
 
             if (_aesKey != null)
             {
                 data = SscpUtils.ProcessAES256(data, _aesKey, _secretWebSocketKey, true);
-                byte[] theHash = SscpUtils.HashKeccak256(data);
+                byte[] theHash = SscpUtils.HashWithKeccak256(data);
                 data = SscpUtils.Combine(theHash, data);
             }
 
@@ -180,7 +180,7 @@ namespace SSCP
                 {
                     byte[] theHash = data.Take(SscpGlobal.HASH_SIZE).ToArray();
                     data = data.Skip(SscpGlobal.HASH_SIZE).ToArray();
-                    byte[] theNewHash = SscpUtils.HashKeccak256(data);
+                    byte[] theNewHash = SscpUtils.HashWithKeccak256(data);
 
                     if (!SscpUtils.CompareByteArrays(theHash, theNewHash))
                     {
@@ -193,7 +193,7 @@ namespace SSCP
 
                 byte[] hash = data.Take(SscpGlobal.HASH_SIZE).ToArray();
                 data = data.Skip(SscpGlobal.HASH_SIZE).ToArray();
-                byte[] newHash = SscpUtils.HashKeccak256(data);
+                byte[] newHash = SscpUtils.HashWithKeccak256(data);
 
                 if (!SscpUtils.CompareByteArrays(hash, newHash))
                 {
