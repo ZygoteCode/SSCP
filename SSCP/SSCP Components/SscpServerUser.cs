@@ -111,13 +111,13 @@ namespace SSCP
 
             if (AesKey != null)
             {
-                data = SscpUtils.ProcessAES256(data, AesKey, HandshakeStep == 4 ? SecretWebSocketKey : new byte[16], true);
+                data = SscpUtils.ProcessAES256(data, AesKey, HandshakeStep == 4 ? SecretWebSocketKey : SscpGlobal.EMPTY_IV, true);
                 byte[] theHash = SscpUtils.HashKeccak256(data);
                 data = SscpUtils.Combine(theHash, data);
             }
 
             await _webSocket.SendAsync(new ArraySegment<byte>(data), WebSocketMessageType.Binary, true, CancellationToken.None);
-            ServerPacketNumber += 0.0001;
+            ServerPacketNumber += SscpGlobal.PACKET_NUMBER_INCREMENTAL;
 
             if (ServerPacketNumber >= SscpGlobal.MAX_PACKET_NUMBER)
             {

@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SscpTest")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+017d8f2c2ac5d4db40b8725d45f8172670dbe45a")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+20b5b430d44896904cdc50fa8aa264354aad6c43")]
 [assembly: System.Reflection.AssemblyProductAttribute("SscpTest")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SscpTest")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

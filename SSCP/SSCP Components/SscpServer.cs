@@ -83,7 +83,7 @@ namespace SSCP
 
                         if (BannedIPs.Contains(context.Request.RemoteEndPoint.Address.ToString()))
                         {
-                            context.Response.StatusCode = 401;
+                            context.Response.StatusCode = SscpGlobal.HTTP_401_UNAUTHORIZED;
                             context.Response.Close();
                             continue;
                         }
@@ -94,7 +94,7 @@ namespace SSCP
                         {
                             if (context.Request.Headers.AllKeys.Length != 5 || context.Request.Headers.AllKeys[0] != "Sec-WebSocket-Key" || context.Request.Headers.AllKeys[1] != "Sec-WebSocket-Version" || context.Request.Headers.AllKeys[2] != "Connection" || context.Request.Headers.AllKeys[3] != "Upgrade" || context.Request.Headers.AllKeys[4] != "Host")
                             {
-                                context.Response.StatusCode = 400;
+                                context.Response.StatusCode = SscpGlobal.HTTP_400_BAD_REQUEST;
                                 context.Response.Close();
                                 continue;
                             }
@@ -107,14 +107,14 @@ namespace SSCP
 
                             if (secWebSocketVersion != "13" || connection != "Upgrade" || upgrade != "websocket" || secWebSocketKey.Length != 24)
                             {
-                                context.Response.StatusCode = 400;
+                                context.Response.StatusCode = SscpGlobal.HTTP_400_BAD_REQUEST;
                                 context.Response.Close();
                                 continue;
                             }
                         }
                         catch
                         {
-                            context.Response.StatusCode = 400;
+                            context.Response.StatusCode = SscpGlobal.HTTP_400_BAD_REQUEST;
                             context.Response.Close();
                             continue;
                         }
@@ -130,7 +130,7 @@ namespace SSCP
                     }
                     else
                     {
-                        context.Response.StatusCode = 400;
+                        context.Response.StatusCode = SscpGlobal.HTTP_400_BAD_REQUEST;
                         context.Response.Close();
                     }
                 }
@@ -364,7 +364,7 @@ namespace SSCP
 
         private async Task HandleWebSocketCommunication(SscpServerUser sscpServerUser)
         {
-            byte[] buffer = new byte[1024 * 4];
+            byte[] buffer = new byte[SscpGlobal.DEFAULT_BUFFER_SIZE];
             List<byte> receivedData = new List<byte>();
 
             while (sscpServerUser.Connected)
@@ -389,8 +389,8 @@ namespace SSCP
 
                 if (sscpServerUser.AesKey != null)
                 {
-                    byte[] theHash = data.Take(32).ToArray();
-                    data = data.Skip(32).ToArray();
+                    byte[] theHash = data.Take(SscpGlobal.HASH_SIZE).ToArray();
+                    data = data.Skip(SscpGlobal.HASH_SIZE).ToArray();
                     byte[] theNewHash = SscpUtils.HashKeccak256(data);
 
                     if (!SscpUtils.CompareByteArrays(theHash, theNewHash))
@@ -398,11 +398,11 @@ namespace SSCP
                         goto close;
                     }
 
-                    data = SscpUtils.ProcessAES256(data, sscpServerUser.AesKey, sscpServerUser.HandshakeStep == 4 ? sscpServerUser.SecretWebSocketKey : new byte[16], false);
+                    data = SscpUtils.ProcessAES256(data, sscpServerUser.AesKey, sscpServerUser.HandshakeStep == 4 ? sscpServerUser.SecretWebSocketKey : SscpGlobal.EMPTY_IV, false);
                 }
 
-                byte[] hash = data.Take(32).ToArray();
-                data = data.Skip(32).ToArray();
+                byte[] hash = data.Take(SscpGlobal.HASH_SIZE).ToArray();
+                data = data.Skip(SscpGlobal.HASH_SIZE).ToArray();
                 byte[] newHash = SscpUtils.HashKeccak256(data);
 
                 if (!SscpUtils.CompareByteArrays(hash, newHash))
@@ -410,32 +410,30 @@ namespace SSCP
                     goto close;
                 }
 
-                double packetNumber = BitConverter.ToDouble(data.Take(8).ToArray(), 0);
+                double packetNumber = BitConverter.ToDouble(data.Take(SscpGlobal.DOUBLE_SIZE).ToArray(), 0);
 
                 if (packetNumber != sscpServerUser.PacketNumber)
                 {
                     goto close;
                 }
 
-                data = data.Skip(8).ToArray();
-
-                byte[] packetId = data.Take(32).ToArray();
-                data = data.Skip(32).ToArray();
+                data = data.Skip(SscpGlobal.DOUBLE_SIZE).ToArray();
+                byte[] packetId = data.Take(SscpGlobal.HASH_SIZE).ToArray();
+                data = data.Skip(SscpGlobal.HASH_SIZE).ToArray();
 
                 if (sscpServerUser.PacketIds.ContainsByteArray(packetId))
                 {
                     goto close;
                 }
 
-                long timestamp = BitConverter.ToInt64(data.Take(8).ToArray());
+                long timestamp = BitConverter.ToInt64(data.Take(SscpGlobal.LONG_SIZE).ToArray());
 
                 if (SscpUtils.GetTimestamp() - timestamp > SscpGlobal.MAX_TIMESTAMP_DELAY)
                 {
                     goto close;
                 }
 
-                data = data.Skip(8).ToArray();
-
+                data = data.Skip(SscpGlobal.LONG_SIZE).ToArray();
                 sscpServerUser.PacketNumber = sscpServerUser.PacketNumber + SscpGlobal.PACKET_NUMBER_INCREMENTAL;
 
                 if (sscpServerUser.PacketNumber >= SscpGlobal.MAX_PACKET_NUMBER)
@@ -455,7 +453,7 @@ namespace SSCP
                     case 2:
                         sscpServerUser.FromClientRSA = new System.Security.Cryptography.RSACryptoServiceProvider();
                         sscpServerUser.FromClientRSA.FromXmlString(Encoding.UTF8.GetString(data));
-                        sscpServerUser.AesTempKey = SscpGlobal.SscpRandom.GetRandomBytes(16);
+                        sscpServerUser.AesTempKey = SscpGlobal.SscpRandom.GetRandomBytes(SscpGlobal.MID_HASH_SIZE);
 
                         await SendAsyncPrivate(sscpServerUser, sscpServerUser.FromClientRSA.Encrypt(sscpServerUser.AesTempKey, false));
                         sscpServerUser.HandshakeStep = 3;

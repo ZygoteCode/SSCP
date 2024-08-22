@@ -75,7 +75,7 @@ namespace SSCP
         {
             _client = new ClientWebSocket();
             _packetNumber = _serverPacketNumber = 0.0;
-            _secretWebSocketKey = new byte[16];
+            _secretWebSocketKey = SscpGlobal.EMPTY_IV;
             _handshakeStep = 0;
             _serverPacketIds.Clear();
             await _client.ConnectAsync(new Uri(_uri), CancellationToken.None);
@@ -159,7 +159,7 @@ namespace SSCP
 
         private async Task ReceiveMessages()
         {
-            byte[] buffer = new byte[1024 * 4];
+            byte[] buffer = new byte[SscpGlobal.DEFAULT_BUFFER_SIZE];
             List<byte> receivedData = new List<byte>();
 
             while (_client.State == WebSocketState.Open)
@@ -178,8 +178,8 @@ namespace SSCP
 
                 if (_aesKey != null)
                 {
-                    byte[] theHash = data.Take(32).ToArray();
-                    data = data.Skip(32).ToArray();
+                    byte[] theHash = data.Take(SscpGlobal.HASH_SIZE).ToArray();
+                    data = data.Skip(SscpGlobal.HASH_SIZE).ToArray();
                     byte[] theNewHash = SscpUtils.HashKeccak256(data);
 
                     if (!SscpUtils.CompareByteArrays(theHash, theNewHash))
@@ -191,8 +191,8 @@ namespace SSCP
                     data = SscpUtils.ProcessAES256(data, _aesKey, _secretWebSocketKey, false);
                 }
 
-                byte[] hash = data.Take(32).ToArray();
-                data = data.Skip(32).ToArray();
+                byte[] hash = data.Take(SscpGlobal.HASH_SIZE).ToArray();
+                data = data.Skip(SscpGlobal.HASH_SIZE).ToArray();
                 byte[] newHash = SscpUtils.HashKeccak256(data);
 
                 if (!SscpUtils.CompareByteArrays(hash, newHash))
@@ -201,7 +201,7 @@ namespace SSCP
                     return;
                 }
 
-                double packetNumber = BitConverter.ToDouble(data.Take(8).ToArray(), 0);
+                double packetNumber = BitConverter.ToDouble(data.Take(SscpGlobal.DOUBLE_SIZE).ToArray(), 0);
 
                 if (packetNumber != _serverPacketNumber)
                 {
@@ -209,8 +209,8 @@ namespace SSCP
                     return;
                 }
 
-                data = data.Skip(8).ToArray();
-                byte[] packetId = data.Take(32).ToArray();
+                data = data.Skip(SscpGlobal.DOUBLE_SIZE).ToArray();
+                byte[] packetId = data.Take(SscpGlobal.HASH_SIZE).ToArray();
 
                 if (_serverPacketIds.ContainsByteArray(packetId))
                 {
@@ -218,8 +218,8 @@ namespace SSCP
                     return;
                 }
 
-                data = data.Skip(32).ToArray();
-                long timestamp = BitConverter.ToInt64(data.Take(8).ToArray());
+                data = data.Skip(SscpGlobal.HASH_SIZE).ToArray();
+                long timestamp = BitConverter.ToInt64(data.Take(SscpGlobal.LONG_SIZE).ToArray());
 
                 if (SscpUtils.GetTimestamp() - timestamp > SscpGlobal.MAX_TIMESTAMP_DELAY)
                 {
@@ -227,7 +227,7 @@ namespace SSCP
                     return;
                 }
 
-                data = data.Skip(8).ToArray();
+                data = data.Skip(SscpGlobal.LONG_SIZE).ToArray();
                 _serverPacketNumber = _serverPacketNumber + SscpGlobal.PACKET_NUMBER_INCREMENTAL;
 
                 if (_serverPacketNumber >= SscpGlobal.MAX_PACKET_NUMBER)
@@ -254,7 +254,7 @@ namespace SSCP
                         _handshakeStep = 2;
                         break;
                     case 2:
-                        byte[] aesKey = SscpGlobal.SscpRandom.GetRandomBytes(16);
+                        byte[] aesKey = SscpGlobal.SscpRandom.GetRandomBytes(SscpGlobal.MID_HASH_SIZE);
 
                         await SendAsyncPrivate(_fromServerRSA.Encrypt(aesKey, false));
                         _aesKey = SscpUtils.Combine(_toServerRSA.Decrypt(data, false), aesKey);
@@ -262,19 +262,19 @@ namespace SSCP
                         _handshakeStep = 3;
                         break;
                     case 3:
-                        _currentId = Encoding.UTF8.GetString(data.Take(64).ToArray());
-                        data = data.Skip(64).ToArray();
+                        _currentId = Encoding.UTF8.GetString(data.Take(SscpGlobal.STRING_HASH_SIZE).ToArray());
+                        data = data.Skip(SscpGlobal.STRING_HASH_SIZE).ToArray();
 
-                        int ipLength = BitConverter.ToInt32(data.Take(4).ToArray());
-                        data = data.Skip(4).ToArray();
+                        int ipLength = BitConverter.ToInt32(data.Take(SscpGlobal.INTEGER_SIZE).ToArray());
+                        data = data.Skip(SscpGlobal.INTEGER_SIZE).ToArray();
 
                         _currentIpAddress = Encoding.UTF8.GetString(data.Take(ipLength).ToArray());
                         data = data.Skip(ipLength).ToArray();
 
-                        _currentPort = BitConverter.ToInt32(data.Take(4).ToArray());
-                        data = data.Skip(4).ToArray();
+                        _currentPort = BitConverter.ToInt32(data.Take(SscpGlobal.INTEGER_SIZE).ToArray());
+                        data = data.Skip(SscpGlobal.INTEGER_SIZE).ToArray();
 
-                        _secretWebSocketKey = data.Take(16).ToArray();
+                        _secretWebSocketKey = data.Take(SscpGlobal.MID_HASH_SIZE).ToArray();
                         
                         _handshakeStep = 4;
                         _handshakeCompleted = true;
