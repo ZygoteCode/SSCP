@@ -12,6 +12,7 @@ namespace SSCP
         private WebSocket _webSocket;
         private IPEndPoint _ipEndPoint;
         private string _id;
+        private SscpCompressionContext _sscpCompressionContext, _otherSscpCompressionContext;
 
         public bool Connected
         {
@@ -64,6 +65,8 @@ namespace SSCP
 
         public SscpServerUser(SscpServer server, WebSocket webSocket, IPEndPoint ipEndPoint, string id, byte[] secretWebSocketKey)
         {
+            _sscpCompressionContext = new SscpCompressionContext();
+            _otherSscpCompressionContext = new SscpCompressionContext();
             _server = server;
             _webSocket = webSocket;
             _ipEndPoint = ipEndPoint;
@@ -74,6 +77,11 @@ namespace SSCP
             ServerPacketIds = new List<byte[]>();
             HandshakeStep = 0;
             SecretWebSocketKey = secretWebSocketKey;
+        }
+
+        public byte[] Decompress(byte[] data)
+        {
+            return _sscpCompressionContext.Decompress(data);
         }
 
         public void Dispose()
@@ -116,6 +124,7 @@ namespace SSCP
                 data = SscpUtils.Combine(theHash, data);
             }
 
+            data = _otherSscpCompressionContext.Compress(data);
             await _webSocket.SendAsync(new ArraySegment<byte>(data), WebSocketMessageType.Binary, true, CancellationToken.None);
             ServerPacketNumber += SscpGlobal.PACKET_NUMBER_INCREMENTAL;
 

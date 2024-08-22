@@ -386,6 +386,7 @@ namespace SSCP
 
                 byte[] data = receivedData.ToArray();
                 receivedData.Clear();
+                data = sscpServerUser.Decompress(data);
 
                 if (sscpServerUser.AesKey != null)
                 {
@@ -474,6 +475,7 @@ namespace SSCP
                         break;
                     case 4:
                         MessageReceived?.Invoke(sscpServerUser, data);
+                        Send(sscpServerUser, Encoding.UTF8.GetBytes($"Hello! I received your message: => \"{Encoding.UTF8.GetString(data)}\"."));
                         break;
                 }
             }

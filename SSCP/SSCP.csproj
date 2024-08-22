@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="BouncyCastle.Cryptography" Version="2.4.0" />
+    <PackageReference Include="DotNetZip" Version="1.16.0" />
   </ItemGroup>
 
 </Project>

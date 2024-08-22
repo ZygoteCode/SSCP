@@ -120,6 +120,10 @@
             "BouncyCastle.Cryptography": {
               "target": "Package",
               "version": "[2.4.0, )"
+            },
+            "DotNetZip": {
+              "target": "Package",
+              "version": "[1.16.0, )"
             }
           },
           "imports": [

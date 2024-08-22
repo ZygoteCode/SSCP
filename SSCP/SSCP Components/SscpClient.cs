@@ -25,6 +25,7 @@ namespace SSCP
         private bool _handshakeCompleted;
         private DateTime _connectedSince;
         private byte[] _secretWebSocketKey;
+        private SscpCompressionContext _sscpCompressionContext, _otherSscpCompressionContext;
 
         public string ID
         {
@@ -74,6 +75,8 @@ namespace SSCP
         public async Task ConnectAsync()
         {
             _client = new ClientWebSocket();
+            _sscpCompressionContext = new SscpCompressionContext();
+            _otherSscpCompressionContext = new SscpCompressionContext();
             _packetNumber = _serverPacketNumber = 0.0;
             _secretWebSocketKey = SscpGlobal.EMPTY_IV;
             _handshakeStep = 0;
@@ -133,6 +136,7 @@ namespace SSCP
                 data = SscpUtils.Combine(theHash, data);
             }
 
+            data = _sscpCompressionContext.Compress(data);
             await _client.SendAsync(new ArraySegment<byte>(data), WebSocketMessageType.Binary, true, CancellationToken.None);
             _packetNumber += SscpGlobal.PACKET_NUMBER_INCREMENTAL;
 
@@ -175,6 +179,7 @@ namespace SSCP
 
                 byte[] data = receivedData.ToArray();
                 receivedData.Clear();
+                data = _otherSscpCompressionContext.Decompress(data);
 
                 if (_aesKey != null)
                 {

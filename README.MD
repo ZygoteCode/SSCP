@@ -14,7 +14,8 @@
   - [x] The constant "new byte[16]" for the Sec-WebSocket-Key must be put into "SscpGlobal"
   - [x] The lengths of hashes, extracted data, etc, must be as constants into "SscpGlobal"
   - [x] Replace MD5 with Keccak128
-  - [ ] Implement (optional or forced?) compression of packets with following one(s) algorithms: GZip, Deflate, Brotli, LZMA, Zlib, Zip, BZip2, LZip - we can choose one of them based on the compression speed and the ratio - https://github.com/GabryB03/SimpleCompression/blob/main/SimpleCompression.cs - (Zlib or Brotli?)
+  - [x] Implement (optional or forced?) compression of packets with following one(s) algorithms: GZip, Deflate, Brotli, LZMA, Zlib, Zip, BZip2, LZip - we can choose one of them based on the compression speed and the ratio - https://github.com/GabryB03/SimpleCompression/blob/main/SimpleCompression.cs - (Zlib or Brotli?)
+  - [ ] Implement integrity check with Keccak256 for compressed data (in encrypted message or out of it? or both?)
   - [ ] Introduce custom packets with a custom "Protocol" (handshake, keep-alive, update AES key, first-second part of AES key update, re-handshake, disconnect, normal message with data, ...)
   - [ ] Periodic exchange of new AES keys (complete and partial)
   - [ ] Custom reason (in bytes / string) on disconnect (client) and kick (server)

@@ -37,3 +37,12 @@ C:\Users\bolog\Desktop\SSCP\SscpTest\obj\x64\Release\net8.0\refint\SscpTest.dll
 C:\Users\bolog\Desktop\SSCP\SscpTest\obj\x64\Release\net8.0\SscpTest.pdb
 C:\Users\bolog\Desktop\SSCP\SscpTest\obj\x64\Release\net8.0\SscpTest.genruntimeconfig.cache
 C:\Users\bolog\Desktop\SSCP\SscpTest\obj\x64\Release\net8.0\ref\SscpTest.dll
+C:\Users\bolog\Desktop\SSCP\SscpTest\bin\x64\Release\net8.0\DotNetZip.dll
+C:\Users\bolog\Desktop\SSCP\SscpTest\bin\x64\Release\net8.0\Microsoft.Win32.SystemEvents.dll
+C:\Users\bolog\Desktop\SSCP\SscpTest\bin\x64\Release\net8.0\System.Drawing.Common.dll
+C:\Users\bolog\Desktop\SSCP\SscpTest\bin\x64\Release\net8.0\System.Security.Permissions.dll
+C:\Users\bolog\Desktop\SSCP\SscpTest\bin\x64\Release\net8.0\System.Windows.Extensions.dll
+C:\Users\bolog\Desktop\SSCP\SscpTest\bin\x64\Release\net8.0\runtimes\win\lib\netcoreapp3.0\Microsoft.Win32.SystemEvents.dll
+C:\Users\bolog\Desktop\SSCP\SscpTest\bin\x64\Release\net8.0\runtimes\unix\lib\netcoreapp3.0\System.Drawing.Common.dll
+C:\Users\bolog\Desktop\SSCP\SscpTest\bin\x64\Release\net8.0\runtimes\win\lib\netcoreapp3.0\System.Drawing.Common.dll
+C:\Users\bolog\Desktop\SSCP\SscpTest\bin\x64\Release\net8.0\runtimes\win\lib\netcoreapp3.0\System.Windows.Extensions.dll
