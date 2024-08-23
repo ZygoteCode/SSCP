@@ -8,7 +8,7 @@ namespace SSCP
     public class SscpClient
     {
         public event Action? ConnectionOpened, ConnectionClosed;
-        public event Action<byte[]>? MessageReceived;
+        public event Action<SscpPacket>? PacketReceived;
 
         private ClientWebSocket _client;
         private string _uri;
@@ -301,7 +301,7 @@ namespace SSCP
                         ConnectionOpened?.Invoke();
                         break;
                     case 4:
-                        MessageReceived?.Invoke(data);
+                        PacketReceived?.Invoke(new SscpPacket(SscpPacketType.DATA, data));
                         break;
                 }
             }

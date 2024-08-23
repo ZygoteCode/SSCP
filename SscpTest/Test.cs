@@ -15,13 +15,13 @@ public class Test
         {
             _sscpServer.UserConnected += SscpServer_UserConnected;
             _sscpServer.UserDisconnected += SscpServer_UserDisconnected;
-            _sscpServer.MessageReceived += SscpServer_MessageReceived;
+            _sscpServer.PacketReceived += _sscpServer_PacketReceived;
             _sscpServer.Start();
         }).Start();
 
         _sscpClient.ConnectionOpened += SscpClient_ConnectionOpened;
         _sscpClient.ConnectionClosed += SscpClient_ConnectionClosed;
-        _sscpClient.MessageReceived += SscpClient_MessageReceived;
+        _sscpClient.PacketReceived += _sscpClient_PacketReceived;
         _sscpClient.Connect();
 
         while (true)
@@ -30,9 +30,20 @@ public class Test
         }
     }
 
-    private static void SscpClient_MessageReceived(byte[] obj)
+    private static void _sscpClient_PacketReceived(SscpPacket obj)
     {
-        Console.WriteLine($"[CLIENT] A new message has been received from the Server => {Encoding.UTF8.GetString(obj)}");
+        if (obj.SscpPacketType.Equals(SscpPacketType.DATA))
+        {
+            Console.WriteLine($"[CLIENT] A new message has been received from the Server => {obj}");
+        }
+    }
+
+    private static void _sscpServer_PacketReceived(SscpServerUser arg1, SscpPacket arg2)
+    {
+        if (arg2.SscpPacketType.Equals(SscpPacketType.DATA))
+        {
+            Console.WriteLine($"[SERVER] A User ({arg1.ID}) has sent a new message to the Server => {arg2}");
+        }
     }
 
     private static void SscpClient_ConnectionClosed()
@@ -53,10 +64,5 @@ public class Test
     private static void SscpServer_UserConnected(SscpServerUser obj)
     {
         Console.WriteLine($"[SERVER] A new User has been connected to the Server. Connection IP address: {obj.ConnectionIpAddress}, connection port: {obj.ConnectionPort}, unique ID: {obj.ID}.");
-    }
-
-    private static void SscpServer_MessageReceived(SscpServerUser arg1, byte[] arg2)
-    {
-        Console.WriteLine($"[SERVER] A User ({arg1.ID}) has sent a new message to the Server => {Encoding.UTF8.GetString(arg2)}");
     }
 }

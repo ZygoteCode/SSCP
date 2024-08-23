@@ -8,7 +8,7 @@ namespace SSCP
 {
     public class SscpServer
     {
-        public event Action<SscpServerUser, byte[]>? MessageReceived;
+        public event Action<SscpServerUser, SscpPacket>? PacketReceived;
         public event Action<SscpServerUser>? UserConnected, UserDisconnected, UserKicked;
 
         private ConcurrentDictionary<SscpServerUser, Task> _users = new ConcurrentDictionary<SscpServerUser, Task>();
@@ -484,7 +484,7 @@ namespace SSCP
                         UserConnected?.Invoke(sscpServerUser);
                         break;
                     case 4:
-                        MessageReceived?.Invoke(sscpServerUser, data);
+                        PacketReceived?.Invoke(sscpServerUser, new SscpPacket(SscpPacketType.DATA, data));
                         Send(sscpServerUser, Encoding.UTF8.GetBytes($"Hello! I received your message: => \"{Encoding.UTF8.GetString(data)}\"."));
                         break;
                 }
