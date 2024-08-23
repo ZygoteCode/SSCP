@@ -137,6 +137,9 @@ namespace SSCP
             }
 
             data = _sscpCompressionContext.Compress(data);
+            byte[] compressedDataHash = SscpUtils.HashWithKeccak256(data);
+            data = SscpUtils.Combine(compressedDataHash, data);
+
             await _client.SendAsync(new ArraySegment<byte>(data), WebSocketMessageType.Binary, true, CancellationToken.None);
             _packetNumber += SscpGlobal.PACKET_NUMBER_INCREMENTAL;
 
@@ -179,6 +182,17 @@ namespace SSCP
 
                 byte[] data = receivedData.ToArray();
                 receivedData.Clear();
+
+                byte[] compressedDataHash = data.Take(SscpGlobal.HASH_SIZE).ToArray();
+                data = data.Skip(SscpGlobal.HASH_SIZE).ToArray();
+                byte[] currentCompressedDataHash = SscpUtils.HashWithKeccak256(data);
+
+                if (!SscpUtils.CompareByteArrays(compressedDataHash, currentCompressedDataHash))
+                {
+                    await DisconnectAsync();
+                    return;
+                }
+
                 data = _otherSscpCompressionContext.Decompress(data);
 
                 if (_aesKey != null)

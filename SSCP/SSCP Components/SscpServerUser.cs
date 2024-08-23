@@ -125,6 +125,9 @@ namespace SSCP
             }
 
             data = _otherSscpCompressionContext.Compress(data);
+            byte[] compressedDataHash = SscpUtils.HashWithKeccak256(data);
+            data = SscpUtils.Combine(compressedDataHash, data);
+
             await _webSocket.SendAsync(new ArraySegment<byte>(data), WebSocketMessageType.Binary, true, CancellationToken.None);
             ServerPacketNumber += SscpGlobal.PACKET_NUMBER_INCREMENTAL;
 

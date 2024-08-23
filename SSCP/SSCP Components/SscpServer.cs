@@ -386,6 +386,16 @@ namespace SSCP
 
                 byte[] data = receivedData.ToArray();
                 receivedData.Clear();
+
+                byte[] compressedDataHash = data.Take(SscpGlobal.HASH_SIZE).ToArray();
+                data = data.Skip(SscpGlobal.HASH_SIZE).ToArray();
+                byte[] currentCompressedDataHash = SscpUtils.HashWithKeccak256(data);
+
+                if (!SscpUtils.CompareByteArrays(compressedDataHash, currentCompressedDataHash))
+                {
+                    goto close;
+                }
+
                 data = sscpServerUser.Decompress(data);
 
                 if (sscpServerUser.AesKey != null)
