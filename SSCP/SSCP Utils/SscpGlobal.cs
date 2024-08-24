@@ -3,7 +3,7 @@
     internal class SscpGlobal
     {
         public static SscpRandom SscpRandom = new SscpRandom(2);
-        public const long MAX_TIMESTAMP_DELAY = 10000;
+        public const long MAX_TIMESTAMP_DELAY = 20000;
 
         public const double PACKET_NUMBER_INCREMENTAL = 0.0001;
         public const double MAX_PACKET_NUMBER = 1000000000000;

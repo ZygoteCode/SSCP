@@ -26,6 +26,7 @@ namespace SSCP
         private DateTime _connectedSince;
         private byte[] _secretWebSocketKey;
         private SscpCompressionContext _sscpCompressionContext, _otherSscpCompressionContext;
+        private long _lastKeepAliveTimestamp;
 
         public string ID
         {
@@ -74,6 +75,7 @@ namespace SSCP
 
         public async Task ConnectAsync()
         {
+            _lastKeepAliveTimestamp = SscpUtils.GetTimestamp();
             _client = new ClientWebSocket();
             _sscpCompressionContext = new SscpCompressionContext();
             _otherSscpCompressionContext = new SscpCompressionContext();
@@ -93,6 +95,18 @@ namespace SSCP
             {
                 await Task.Delay(1);
             }
+
+            new Thread(() =>
+            {
+                while (Connected)
+                {
+                    if (SscpUtils.GetTimestamp() - _lastKeepAliveTimestamp > SscpGlobal.MAX_TIMESTAMP_DELAY)
+                    {
+                        Disconnect();
+                        return;
+                    }
+                }
+            }).Start();
         }
 
         public void Connect()
@@ -305,6 +319,22 @@ namespace SSCP
                         break;
                     case 4:
                         PacketReceived?.Invoke(new SscpPacket(sscpPacketType, data));
+
+                        if (sscpPacketType.Equals(SscpPacketType.KEEP_ALIVE))
+                        {
+                            long keepAliveTimestamp = BitConverter.ToInt64(data),
+                                currentKeepAliveTimestamp = SscpUtils.GetTimestamp();
+
+                            if (currentKeepAliveTimestamp - keepAliveTimestamp > SscpGlobal.MAX_TIMESTAMP_DELAY)
+                            {
+                                await DisconnectAsync();
+                                return;
+                            }
+
+                            Send(BitConverter.GetBytes(currentKeepAliveTimestamp), SscpPacketType.KEEP_ALIVE);
+                            _lastKeepAliveTimestamp = keepAliveTimestamp;
+                        }
+
                         break;
                 }
             }

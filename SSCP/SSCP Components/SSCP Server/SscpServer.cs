@@ -342,30 +342,45 @@ namespace SSCP
             KickAsync(id).GetAwaiter().GetResult();
         }
 
-        public async Task SendAsync(string id, byte[] data)
+        public async Task SendAsync(string id, byte[] data, SscpPacketType sscpPacketType = SscpPacketType.DATA)
         {
-            await SendAsync(GetUserByID(id)!, data);
+            await SendAsync(GetUserByID(id)!, data, sscpPacketType);
         }
 
-        public void Send(string id, byte[] data)
+        public void Send(string id, byte[] data, SscpPacketType sscpPacketType = SscpPacketType.DATA)
         {
-            SendAsync(id, data).GetAwaiter().GetResult();
+            SendAsync(id, data, sscpPacketType).GetAwaiter().GetResult();
         }
 
-        public async Task SendAsync(string id, string data)
+        public async Task SendAsync(string id, string data, SscpPacketType sscpPacketType = SscpPacketType.DATA)
         {
-            await SendAsync(GetUserByID(id)!, data);
+            await SendAsync(GetUserByID(id)!, data, sscpPacketType);
         }
 
-        public void Send(string id, string data)
+        public void Send(string id, string data, SscpPacketType sscpPacketType = SscpPacketType.DATA)
         {
-            SendAsync(id, data).GetAwaiter().GetResult();
+            SendAsync(id, data, sscpPacketType).GetAwaiter().GetResult();
         }
 
         private async Task HandleWebSocketCommunication(SscpServerUser sscpServerUser)
         {
             byte[] buffer = new byte[SscpGlobal.DEFAULT_BUFFER_SIZE];
             List<byte> receivedData = new List<byte>();
+
+            new Thread(() =>
+            {
+                while (sscpServerUser.Connected)
+                {
+                    Thread.Sleep(3000);
+                    Send(sscpServerUser, BitConverter.GetBytes(SscpUtils.GetTimestamp()), SscpPacketType.KEEP_ALIVE);
+
+                    if (SscpUtils.GetTimestamp() - sscpServerUser.LastKeepAliveTimestamp > SscpGlobal.MAX_TIMESTAMP_DELAY)
+                    {
+                        KickAsyncPrivate(sscpServerUser).GetAwaiter().GetResult();
+                        return;
+                    }
+                }
+            }).Start();
 
             while (sscpServerUser.Connected)
             {
@@ -488,7 +503,24 @@ namespace SSCP
                         break;
                     case 4:
                         PacketReceived?.Invoke(sscpServerUser, new SscpPacket(sscpPacketType, data));
-                        Send(sscpServerUser, Encoding.UTF8.GetBytes($"Hello! I received your message: => \"{Encoding.UTF8.GetString(data)}\"."));
+
+                        if (sscpPacketType.Equals(SscpPacketType.DATA))
+                        {
+                            Send(sscpServerUser, Encoding.UTF8.GetBytes($"Hello! I received your message: => \"{Encoding.UTF8.GetString(data)}\"."));
+                        }
+                        else if (sscpPacketType.Equals(SscpPacketType.KEEP_ALIVE))
+                        {
+                            long keepAliveTimestamp = BitConverter.ToInt64(data),
+                                currentKeepAliveTimestamp = SscpUtils.GetTimestamp();
+
+                            if (currentKeepAliveTimestamp - keepAliveTimestamp > SscpGlobal.MAX_TIMESTAMP_DELAY)
+                            {
+                                goto close;
+                            }
+
+                            sscpServerUser.LastKeepAliveTimestamp = keepAliveTimestamp;
+                        }
+
                         break;
                 }
             }

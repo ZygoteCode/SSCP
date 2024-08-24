@@ -1,12 +1,54 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\Users\\bolog\\Desktop\\SSCP\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{6CAC98E3-F66F-467D-9EAC-18082A2CAB2C}|SSCP\\SSCP.csproj|c:\\users\\bolog\\desktop\\sscp\\sscp\\sscp components\\sscp client\\sscpclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6CAC98E3-F66F-467D-9EAC-18082A2CAB2C}|SSCP\\SSCP.csproj|solutionrelative:sscp\\sscp components\\sscp client\\sscpclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6CAC98E3-F66F-467D-9EAC-18082A2CAB2C}|SSCP\\SSCP.csproj|c:\\users\\bolog\\desktop\\sscp\\sscp\\sscp components\\sscp server\\sscpserver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6CAC98E3-F66F-467D-9EAC-18082A2CAB2C}|SSCP\\SSCP.csproj|solutionrelative:sscp\\sscp components\\sscp server\\sscpserver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
       "VerticalTabListWidth": 256,
-      "DocumentGroups": []
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "SscpServer.cs",
+              "DocumentMoniker": "C:\\Users\\bolog\\Desktop\\SSCP\\SSCP\\SSCP Components\\SSCP Server\\SscpServer.cs",
+              "RelativeDocumentMoniker": "SSCP\\SSCP Components\\SSCP Server\\SscpServer.cs",
+              "ToolTip": "C:\\Users\\bolog\\Desktop\\SSCP\\SSCP\\SSCP Components\\SSCP Server\\SscpServer.cs",
+              "RelativeToolTip": "SSCP\\SSCP Components\\SSCP Server\\SscpServer.cs",
+              "ViewState": "AgIAAGEBAAAAAAAAAIAwwHEBAAAcAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-24T05:51:37.001Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "SscpClient.cs",
+              "DocumentMoniker": "C:\\Users\\bolog\\Desktop\\SSCP\\SSCP\\SSCP Components\\SSCP Client\\SscpClient.cs",
+              "RelativeDocumentMoniker": "SSCP\\SSCP Components\\SSCP Client\\SscpClient.cs",
+              "ToolTip": "C:\\Users\\bolog\\Desktop\\SSCP\\SSCP\\SSCP Components\\SSCP Client\\SscpClient.cs",
+              "RelativeToolTip": "SSCP\\SSCP Components\\SSCP Client\\SscpClient.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAGAAAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-24T05:50:17.554Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
     }
   ]
 }

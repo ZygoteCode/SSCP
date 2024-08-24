@@ -62,9 +62,11 @@ namespace SSCP
         public bool HandshakeCompleted { get; set; }
         public DateTime ConnectedSince { get; set; }
         public byte[] SecretWebSocketKey { get; set; }
+        public long LastKeepAliveTimestamp { get; set; }
 
         public SscpServerUser(SscpServer server, WebSocket webSocket, IPEndPoint ipEndPoint, string id, byte[] secretWebSocketKey)
         {
+            LastKeepAliveTimestamp = SscpUtils.GetTimestamp();
             _sscpCompressionContext = new SscpCompressionContext();
             _otherSscpCompressionContext = new SscpCompressionContext();
             _server = server;
