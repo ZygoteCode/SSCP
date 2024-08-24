@@ -9,15 +9,7 @@
   - [ ] User guide
   - [ ] Complete tests
   - [ ] Official explanation of the protocol
-
-- [ ] **Features (release V4):**
-  - [x] The constant "new byte[16]" for the Sec-WebSocket-Key must be put into "SscpGlobal"
-  - [x] The lengths of hashes, extracted data, etc, must be as constants into "SscpGlobal"
-  - [x] Replace MD5 with Keccak128
-  - [x] Implement (optional or forced?) compression of packets with following one(s) algorithms: GZip, Deflate, Brotli, LZMA, Zlib, Zip, BZip2, LZip - we can choose one of them based on the compression speed and the ratio - https://github.com/GabryB03/SimpleCompression/blob/main/SimpleCompression.cs - (Zlib or Brotli?)
-  - [x] Implement integrity check with Keccak256 for compressed data (in encrypted message or out of it? or both?)
-  - [x] Introduce custom packets with a custom "Protocol" (keep-alive)
-
+  
 - [ ] **Features (in the near future):**
   - [ ] Error handling to prevent lose data, lose connections, or temporary downtimes
   - [ ] Better security with HTTPS (SSL & TLS), support of certificates
