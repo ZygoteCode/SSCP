@@ -256,34 +256,34 @@ namespace SSCP
             StopAsync().GetAwaiter().GetResult();
         }
 
-        private async Task SendAsyncPrivate(SscpServerUser sscpServerUser, byte[] data)
+        private async Task SendAsyncPrivate(SscpServerUser sscpServerUser, byte[] data, SscpPacketType sscpPacketType = SscpPacketType.DATA)
         {
-            await sscpServerUser.SendAsync(data);
+            await sscpServerUser.SendAsync(data, sscpPacketType);
         }
 
-        public async Task SendAsync(SscpServerUser sscpServerUser, byte[] data)
+        public async Task SendAsync(SscpServerUser sscpServerUser, byte[] data, SscpPacketType sscpPacketType = SscpPacketType.DATA)
         {
             while (!sscpServerUser.HandshakeCompleted)
             {
                 await Task.Delay(1);
             }
 
-            await SendAsyncPrivate(sscpServerUser, data);
+            await SendAsyncPrivate(sscpServerUser, data, sscpPacketType);
         }
 
-        public async Task SendAsync(SscpServerUser sscpServerUser, string data)
+        public async Task SendAsync(SscpServerUser sscpServerUser, string data, SscpPacketType sscpPacketType = SscpPacketType.DATA)
         {
-            await SendAsync(sscpServerUser, Encoding.UTF8.GetBytes(data));
+            await SendAsync(sscpServerUser, Encoding.UTF8.GetBytes(data), sscpPacketType);
         }
 
-        public void Send(SscpServerUser sscpServerUser, byte[] data)
+        public void Send(SscpServerUser sscpServerUser, byte[] data, SscpPacketType sscpPacketType = SscpPacketType.DATA)
         {
-            SendAsync(sscpServerUser, data).GetAwaiter().GetResult();
+            SendAsync(sscpServerUser, data, sscpPacketType).GetAwaiter().GetResult();
         }
 
-        public void Send(SscpServerUser sscpServerUser, string data)
+        public void Send(SscpServerUser sscpServerUser, string data, SscpPacketType sscpPacketType = SscpPacketType.DATA)
         {
-            SendAsync(sscpServerUser, data).GetAwaiter().GetResult();
+            SendAsync(sscpServerUser, data, sscpPacketType).GetAwaiter().GetResult();
         }
 
         private async Task KickAsyncPrivate(SscpServerUser sscpServerUser)
@@ -387,6 +387,9 @@ namespace SSCP
                 byte[] data = receivedData.ToArray();
                 receivedData.Clear();
 
+                SscpPacketType sscpPacketType = (SscpPacketType)BitConverter.ToInt32(data.Take(SscpGlobal.INTEGER_SIZE).ToArray());
+                data = data.Skip(SscpGlobal.INTEGER_SIZE).ToArray();
+
                 byte[] compressedDataHash = data.Take(SscpGlobal.HASH_SIZE).ToArray();
                 data = data.Skip(SscpGlobal.HASH_SIZE).ToArray();
                 byte[] currentCompressedDataHash = SscpUtils.HashWithKeccak256(data);
@@ -484,13 +487,13 @@ namespace SSCP
                         UserConnected?.Invoke(sscpServerUser);
                         break;
                     case 4:
-                        PacketReceived?.Invoke(sscpServerUser, new SscpPacket(SscpPacketType.DATA, data));
+                        PacketReceived?.Invoke(sscpServerUser, new SscpPacket(sscpPacketType, data));
                         Send(sscpServerUser, Encoding.UTF8.GetBytes($"Hello! I received your message: => \"{Encoding.UTF8.GetString(data)}\"."));
                         break;
                 }
             }
 
-        close: await KickAsyncPrivate(sscpServerUser);
+            close: await KickAsyncPrivate(sscpServerUser);
         }
     }
 }

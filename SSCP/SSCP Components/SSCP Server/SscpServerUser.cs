@@ -109,7 +109,7 @@ namespace SSCP
             KickAsync().GetAwaiter().GetResult();
         }
 
-        public async Task SendAsync(byte[] data)
+        public async Task SendAsync(byte[] data, SscpPacketType sscpPacketType = SscpPacketType.DATA)
         {
             byte[] packetId = SscpUtils.GeneratePacketID();
 
@@ -126,7 +126,7 @@ namespace SSCP
 
             data = _otherSscpCompressionContext.Compress(data);
             byte[] compressedDataHash = SscpUtils.HashWithKeccak256(data);
-            data = SscpUtils.Combine(compressedDataHash, data);
+            data = SscpUtils.Combine(BitConverter.GetBytes((int)sscpPacketType), compressedDataHash, data);
 
             await _webSocket.SendAsync(new ArraySegment<byte>(data), WebSocketMessageType.Binary, true, CancellationToken.None);
             ServerPacketNumber += SscpGlobal.PACKET_NUMBER_INCREMENTAL;
@@ -144,19 +144,19 @@ namespace SSCP
             }
         }
 
-        public void Send(byte[] data)
+        public void Send(byte[] data, SscpPacketType sscpPacketType = SscpPacketType.DATA)
         {
-            SendAsync(data).GetAwaiter().GetResult();
+            SendAsync(data, sscpPacketType).GetAwaiter().GetResult();
         }
 
-        public async Task SendAsync(string data)
+        public async Task SendAsync(string data, SscpPacketType sscpPacketType = SscpPacketType.DATA)
         {
-            await SendAsync(Encoding.UTF8.GetBytes(data));
+            await SendAsync(Encoding.UTF8.GetBytes(data), sscpPacketType);
         }
 
-        public void Send(string data)
+        public void Send(string data, SscpPacketType sscpPacketType = SscpPacketType.DATA)
         {
-            SendAsync(data).GetAwaiter().GetResult();
+            SendAsync(data, sscpPacketType).GetAwaiter().GetResult();
         }
 
         public async Task<WebSocketReceiveResult> ReceiveAsync(ArraySegment<byte> buffer)
