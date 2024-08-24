@@ -32,7 +32,7 @@
   - [ ] ~~(Teoric) HWID (hashed) authentication system~~ - We can't go through into specific dynamics, this can be managed by servers' creators.
 
 ## Probably Discarded Ideas
-  - [ ] Introduce packets (handshake, keep-alive, update AES key, first-second part of AES key update, re-handshake, disconnect, normal message with data, ...)
+  - [ ] Introduce packets (handshake, update AES key, first-second part of AES key update, re-handshake, disconnect, normal message with data, ...)
   - [ ] Periodic exchange of new AES keys (complete and partial)
   - [ ] Custom reason (in bytes / string) on disconnect (client) and kick (server)
   - [ ] Establishing rules between Server and Client (max packet size, max users dynamically, max delay, ...)
