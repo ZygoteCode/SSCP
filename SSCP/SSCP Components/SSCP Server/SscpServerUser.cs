@@ -63,6 +63,7 @@ namespace SSCP
         public DateTime ConnectedSince { get; set; }
         public byte[] SecretWebSocketKey { get; set; }
         public long LastKeepAliveTimestamp { get; set; }
+        public Dictionary<object, object> Properties { get; set; }
 
         public SscpServerUser(SscpServer server, WebSocket webSocket, IPEndPoint ipEndPoint, string id, byte[] secretWebSocketKey)
         {
@@ -79,6 +80,7 @@ namespace SSCP
             ServerPacketIds = new List<byte[]>();
             HandshakeStep = 0;
             SecretWebSocketKey = secretWebSocketKey;
+            Properties = new Dictionary<object, object>();
         }
 
         public byte[] Decompress(byte[] data)
