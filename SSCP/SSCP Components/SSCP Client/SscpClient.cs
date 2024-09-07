@@ -102,7 +102,7 @@ namespace SSCP
             {
                 await Task.Delay(1);
             }
-
+            
             new Thread(() =>
             {
                 while (Connected)
