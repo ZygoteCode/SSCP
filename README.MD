@@ -12,6 +12,7 @@
   
 - [ ] **Features (release V5):**
   - [x] Better security with HTTPS (SSL & TLS), support of certificates
+  - [x] Better security for man-in-the-middle (MITM) attacks
   - [ ] Allow better chunking for big datas (like images, videos, ...) - this can allow upload/download of files
   - [ ] Anti DDoS feature (max packets in seconds/milliseconds, data patterns, strange IP addresses ranges in a span of time, anti HTTP requests spam, ...)
   - [ ] Error handling to prevent lose data, lose connections, or temporary downtimes
