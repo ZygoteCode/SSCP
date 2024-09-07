@@ -137,6 +137,7 @@ namespace SSCP
 
         private async Task SendAsyncPrivate(byte[] data, SscpPacketType sscpPacketType = SscpPacketType.DATA)
         {
+            byte[] generatedKeyPart = SscpGlobal.SscpRandom.GetRandomBytes(SscpGlobal.PACKET_GENERATED_KEY_LENGTH);
             byte[] packetId = SscpUtils.GeneratePacketID();
 
             data = SscpUtils.Combine(BitConverter.GetBytes(_packetNumber), packetId, BitConverter.GetBytes(SscpUtils.GetTimestamp()), data);
@@ -145,14 +146,14 @@ namespace SSCP
 
             if (_aesKey != null)
             {
-                data = SscpUtils.ProcessAES256(data, _aesKey, _secretWebSocketKey, true);
+                data = SscpUtils.ProcessAES256(data, SscpUtils.Combine(_aesKey.Skip(SscpGlobal.PACKET_GENERATED_KEY_LENGTH).ToArray(), generatedKeyPart), _secretWebSocketKey, true);
                 byte[] theHash = SscpUtils.HashWithKeccak256(data);
                 data = SscpUtils.Combine(theHash, data);
             }
 
             data = _sscpCompressionContext.Compress(data);
             byte[] compressedDataHash = SscpUtils.HashWithKeccak256(data);
-            data = SscpUtils.Combine(BitConverter.GetBytes((int) sscpPacketType), compressedDataHash, data);
+            data = SscpUtils.Combine(generatedKeyPart, BitConverter.GetBytes((int) sscpPacketType), compressedDataHash, data);
 
             await _client.SendAsync(new ArraySegment<byte>(data), WebSocketMessageType.Binary, true, CancellationToken.None);
             _packetNumber += SscpGlobal.PACKET_NUMBER_INCREMENTAL;
@@ -197,6 +198,9 @@ namespace SSCP
                 byte[] data = receivedData.ToArray();
                 receivedData.Clear();
 
+                byte[] generatedKeyPart = data.Take(SscpGlobal.PACKET_GENERATED_KEY_LENGTH).ToArray();
+                data = data.Skip(SscpGlobal.PACKET_GENERATED_KEY_LENGTH).ToArray();
+
                 SscpPacketType sscpPacketType = (SscpPacketType)BitConverter.ToInt32(data.Take(SscpGlobal.INTEGER_SIZE).ToArray());
                 data = data.Skip(SscpGlobal.INTEGER_SIZE).ToArray();
 
@@ -224,7 +228,7 @@ namespace SSCP
                         return;
                     }
 
-                    data = SscpUtils.ProcessAES256(data, _aesKey, _secretWebSocketKey, false);
+                    data = SscpUtils.ProcessAES256(data, SscpUtils.Combine(_aesKey.Skip(5).ToArray(), generatedKeyPart), _secretWebSocketKey, false);
                 }
 
                 byte[] hash = data.Take(SscpGlobal.HASH_SIZE).ToArray();

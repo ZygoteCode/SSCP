@@ -115,6 +115,7 @@ namespace SSCP
 
         public async Task SendAsync(byte[] data, SscpPacketType sscpPacketType = SscpPacketType.DATA)
         {
+            byte[] generatedKeyPart = SscpGlobal.SscpRandom.GetRandomBytes(SscpGlobal.PACKET_GENERATED_KEY_LENGTH);
             byte[] packetId = SscpUtils.GeneratePacketID();
 
             data = SscpUtils.Combine(BitConverter.GetBytes(ServerPacketNumber), packetId, BitConverter.GetBytes(SscpUtils.GetTimestamp()), data);
@@ -123,14 +124,14 @@ namespace SSCP
 
             if (AesKey != null)
             {
-                data = SscpUtils.ProcessAES256(data, AesKey, HandshakeStep == 4 ? SecretWebSocketKey : SscpGlobal.EMPTY_IV, true);
+                data = SscpUtils.ProcessAES256(data, SscpUtils.Combine(AesKey.Skip(SscpGlobal.PACKET_GENERATED_KEY_LENGTH).ToArray(), generatedKeyPart), HandshakeStep == 4 ? SecretWebSocketKey : SscpGlobal.EMPTY_IV, true);
                 byte[] theHash = SscpUtils.HashWithKeccak256(data);
                 data = SscpUtils.Combine(theHash, data);
             }
 
             data = _otherSscpCompressionContext.Compress(data);
             byte[] compressedDataHash = SscpUtils.HashWithKeccak256(data);
-            data = SscpUtils.Combine(BitConverter.GetBytes((int)sscpPacketType), compressedDataHash, data);
+            data = SscpUtils.Combine(generatedKeyPart, BitConverter.GetBytes((int)sscpPacketType), compressedDataHash, data);
 
             await _webSocket.SendAsync(new ArraySegment<byte>(data), WebSocketMessageType.Binary, true, CancellationToken.None);
             ServerPacketNumber += SscpGlobal.PACKET_NUMBER_INCREMENTAL;

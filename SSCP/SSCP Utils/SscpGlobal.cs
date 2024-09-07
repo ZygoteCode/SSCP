@@ -17,6 +17,7 @@
 
         public const int PACKET_ID_SIZE = 6;
         public const int PACKET_ID_MAX_COUNT = 100;
+        public const int PACKET_GENERATED_KEY_LENGTH = 5;
 
         public const int HASH_SIZE = 32;
         public const int STRING_HASH_SIZE = HASH_SIZE * 2;

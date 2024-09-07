@@ -402,6 +402,9 @@ namespace SSCP
                 byte[] data = receivedData.ToArray();
                 receivedData.Clear();
 
+                byte[] generatedKeyPart = data.Take(SscpGlobal.PACKET_GENERATED_KEY_LENGTH).ToArray();
+                data = data.Skip(SscpGlobal.PACKET_GENERATED_KEY_LENGTH).ToArray();
+
                 SscpPacketType sscpPacketType = (SscpPacketType)BitConverter.ToInt32(data.Take(SscpGlobal.INTEGER_SIZE).ToArray());
                 data = data.Skip(SscpGlobal.INTEGER_SIZE).ToArray();
 
@@ -427,7 +430,7 @@ namespace SSCP
                         goto close;
                     }
 
-                    data = SscpUtils.ProcessAES256(data, sscpServerUser.AesKey, sscpServerUser.HandshakeStep == 4 ? sscpServerUser.SecretWebSocketKey : SscpGlobal.EMPTY_IV, false);
+                    data = SscpUtils.ProcessAES256(data, SscpUtils.Combine(sscpServerUser.AesKey.Skip(5).ToArray(), generatedKeyPart), sscpServerUser.HandshakeStep == 4 ? sscpServerUser.SecretWebSocketKey : SscpGlobal.EMPTY_IV, false);
                 }
 
                 byte[] hash = data.Take(SscpGlobal.HASH_SIZE).ToArray();
