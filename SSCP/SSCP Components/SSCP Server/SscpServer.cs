@@ -92,7 +92,7 @@ namespace SSCP
                         
                         try
                         {
-                            if (context.Request.Headers.AllKeys.Length != 5 || context.Request.Headers.AllKeys[0] != "Sec-WebSocket-Key" || context.Request.Headers.AllKeys[1] != "Sec-WebSocket-Version" || context.Request.Headers.AllKeys[2] != "Connection" || context.Request.Headers.AllKeys[3] != "Upgrade" || context.Request.Headers.AllKeys[4] != "Host")
+                            if (context.Request.Headers.AllKeys.Length != 6 || context.Request.Headers.AllKeys[0] != "Sec-WebSocket-Key" || context.Request.Headers.AllKeys[1] != "Sec-WebSocket-Version" || context.Request.Headers.AllKeys[2] != "Sec-WebSocket-Protocol" || context.Request.Headers.AllKeys[3] != "Connection" || context.Request.Headers.AllKeys[4] != "Upgrade" || context.Request.Headers.AllKeys[5] != "Host")
                             {
                                 context.Response.StatusCode = SscpGlobal.HTTP_400_BAD_REQUEST;
                                 context.Response.Close();
@@ -102,10 +102,11 @@ namespace SSCP
                             secWebSocketKey = context.Request.Headers[0]!;
 
                             string secWebSocketVersion = context.Request.Headers[1]!,
-                                connection = context.Request.Headers[2]!,
-                                upgrade = context.Request.Headers[3]!;
+                                protocol = context.Request.Headers[2]!,
+                                connection = context.Request.Headers[3]!,
+                                upgrade = context.Request.Headers[4]!;
 
-                            if (secWebSocketVersion != "13" || connection != "Upgrade" || upgrade != "websocket" || secWebSocketKey.Length != 24)
+                            if (secWebSocketVersion != "13" || protocol != "SSCP" || connection != "Upgrade" || upgrade != "websocket" || secWebSocketKey.Length != 24)
                             {
                                 context.Response.StatusCode = SscpGlobal.HTTP_400_BAD_REQUEST;
                                 context.Response.Close();
@@ -119,7 +120,7 @@ namespace SSCP
                             continue;
                         }
 
-                        HttpListenerWebSocketContext webSocketContext = await context.AcceptWebSocketAsync(null);
+                        HttpListenerWebSocketContext webSocketContext = await context.AcceptWebSocketAsync("SSCP");
                         WebSocket webSocket = webSocketContext.WebSocket;
                         byte[] newSecretWebSocketKey = SscpUtils.GetKeyFromSecretWebSocketKey(secWebSocketKey);
                         SscpServerUser sscpServerUser = new SscpServerUser(this, webSocket, context.Request.RemoteEndPoint, SscpUtils.GenerateUserID(context.Request.RemoteEndPoint.Address.ToString(), context.Request.RemoteEndPoint.Port, newSecretWebSocketKey), SscpUtils.GetKeyFromSecretWebSocketKey(secWebSocketKey));

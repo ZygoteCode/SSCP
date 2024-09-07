@@ -77,6 +77,7 @@ namespace SSCP
         {
             _lastKeepAliveTimestamp = SscpUtils.GetTimestamp();
             _client = new ClientWebSocket();
+            _client.Options.AddSubProtocol("SSCP");
             _sscpCompressionContext = new SscpCompressionContext();
             _otherSscpCompressionContext = new SscpCompressionContext();
             _packetNumber = _serverPacketNumber = 0.0;
@@ -85,6 +86,12 @@ namespace SSCP
             _serverPacketIds.Clear();
             await _client.ConnectAsync(new Uri(_uri), CancellationToken.None);
             _handshakeStep = 1;
+
+            if (_client.SubProtocol != "SSCP")
+            {
+                Disconnect();
+                return;
+            }
 
             Task.Run(async () =>
             {
@@ -100,6 +107,8 @@ namespace SSCP
             {
                 while (Connected)
                 {
+                    Thread.Sleep(3000);
+
                     if (SscpUtils.GetTimestamp() - _lastKeepAliveTimestamp > SscpGlobal.MAX_TIMESTAMP_DELAY)
                     {
                         Disconnect();
