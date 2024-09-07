@@ -51,13 +51,13 @@ namespace SSCP
         public int MaxUsers { get; set; }
         public List<string> BannedIPs { get; }
 
-        public SscpServer(ushort port = SscpGlobal.DEFAULT_PORT, int maxUsers = -1)
+        public SscpServer(ushort port = SscpGlobal.DEFAULT_PORT, int maxUsers = -1, bool secure = false)
         {
             MaxUsers = maxUsers;
             BannedIPs = new List<string>();
 
             _httpListener = new HttpListener();
-            _httpListener.Prefixes.Add($"http://{SscpGlobal.DEFAULT_SERVER_IP}:{port}{SscpGlobal.DEFAULT_URL_SLUG}");
+            _httpListener.Prefixes.Add($"http{(secure ? "s" : "")}://{SscpGlobal.DEFAULT_SERVER_IP}:{(secure ? "443" : port)}{SscpGlobal.DEFAULT_URL_SLUG}");
         }
 
         public async Task StartAsync()

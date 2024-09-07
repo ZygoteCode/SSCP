@@ -8,8 +8,8 @@ public class Test
 
     public static void Main()
     {
-        _sscpServer = new SscpServer(9987);
-        _sscpClient = new SscpClient("127.0.0.1", 9987);
+        _sscpServer = new SscpServer(9987, -1, false);
+        _sscpClient = new SscpClient("127.0.0.1", false, 9987);
 
         new Thread(() =>
         {

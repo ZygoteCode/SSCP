@@ -68,9 +68,9 @@ namespace SSCP
             }
         }
 
-        public SscpClient(string host, ushort port = SscpGlobal.DEFAULT_PORT)
+        public SscpClient(string host, bool secure = false, ushort port = SscpGlobal.DEFAULT_PORT)
         {
-            _uri = $"ws://{host}:{port}{SscpGlobal.DEFAULT_URL_SLUG}";
+            _uri = $"ws{(secure ? "s" : "")}://{host}{(!secure ? (":" + port) : "")}{SscpGlobal.DEFAULT_URL_SLUG}";
         }
 
         public async Task ConnectAsync()
