@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SSCP")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ad0197f88929b9f1f39fef48c8b0d76fb986707a")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+be4555dff178f5f7e7ba9c916ff77ed3f7a60bd3")]
 [assembly: System.Reflection.AssemblyProductAttribute("SSCP")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SSCP")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
