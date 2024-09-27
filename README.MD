@@ -10,10 +10,7 @@
   - [ ] Complete tests
   - [ ] Official explanation of the protocol
   
-- [ ] **Features (release V5):**
-  - [x] Better security with HTTPS (SSL & TLS), support of certificates
-  - [x] Better security for man-in-the-middle (MITM) attacks
-  - [x] Custom Headers in HTTP request for WebSocket, by the Client and the Server, for validation
+- [ ] **Features (release V6?):**
   - [ ] Allow better chunking for big datas (like images, videos, ...) - this can allow upload/download of files
   - [ ] Anti DDoS feature (max packets in seconds/milliseconds, data patterns, strange IP addresses ranges in a span of time, anti HTTP requests spam, ...)
   - [ ] Error handling to prevent lose data, lose connections, or temporary downtimes
