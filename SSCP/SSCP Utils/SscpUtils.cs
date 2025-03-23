@@ -2,6 +2,7 @@
 using Org.BouncyCastle.Crypto.Digests;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Security;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace SSCP.Utils
@@ -94,12 +95,20 @@ namespace SSCP.Utils
 
         public static byte[] GeneratePacketID()
         {
-            return HashWithKeccak256(Combine(SscpGlobal.SscpRandom.GetRandomByteArray(SscpGlobal.PACKET_ID_SIZE), BitConverter.GetBytes(GetTimestamp())));
+            return HashWithKeccak256(Combine(GetRandomByteArray(SscpGlobal.PACKET_ID_SIZE), BitConverter.GetBytes(GetTimestamp())));
         }
 
         public static string GenerateUserID(string ipAddress, int port, byte[] secretWebSocketKey)
         {
-            return Convert.ToHexString(HashWithKeccak256(Combine(Encoding.UTF8.GetBytes(ipAddress), BitConverter.GetBytes(port), secretWebSocketKey, SscpGlobal.SscpRandom.GetRandomBytes(32), BitConverter.GetBytes(GetTimestamp())))).ToLower();
+            return Convert.ToHexString(HashWithKeccak256(Combine(Encoding.UTF8.GetBytes(ipAddress), BitConverter.GetBytes(port), secretWebSocketKey, GetRandomByteArray(32), BitConverter.GetBytes(GetTimestamp())))).ToLower();
+        }
+
+        public static byte[] GetRandomByteArray(int size)
+        {
+            RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
+            byte[] random = new byte[size];
+            rng.GetBytes(random);
+            return random;
         }
     }
 }

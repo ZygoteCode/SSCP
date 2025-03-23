@@ -146,7 +146,7 @@ namespace SSCP
 
         private async Task SendAsyncPrivate(byte[] data, SscpPacketType sscpPacketType = SscpPacketType.DATA)
         {
-            byte[] generatedKeyPart = SscpGlobal.SscpRandom.GetRandomBytes(SscpGlobal.PACKET_GENERATED_KEY_LENGTH);
+            byte[] generatedKeyPart = SscpUtils.GetRandomByteArray(SscpGlobal.PACKET_GENERATED_KEY_LENGTH);
             byte[] packetId = SscpUtils.GeneratePacketID();
 
             data = SscpUtils.Combine(BitConverter.GetBytes(_packetNumber), packetId, BitConverter.GetBytes(SscpUtils.GetTimestamp()), data);
@@ -303,7 +303,7 @@ namespace SSCP
                         _handshakeStep = 2;
                         break;
                     case 2:
-                        byte[] aesKey = SscpGlobal.SscpRandom.GetRandomBytes(SscpGlobal.MID_HASH_SIZE);
+                        byte[] aesKey = SscpUtils.GetRandomByteArray(SscpGlobal.MID_HASH_SIZE);
 
                         await SendAsyncPrivate(_fromServerRSA.Encrypt(aesKey, false));
                         _aesKey = SscpUtils.Combine(_toServerRSA.Decrypt(data, false), aesKey);

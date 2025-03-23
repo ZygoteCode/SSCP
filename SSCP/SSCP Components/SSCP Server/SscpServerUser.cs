@@ -11,7 +11,6 @@ namespace SSCP
         private SscpServer _server;
         private WebSocket _webSocket;
         private IPEndPoint _ipEndPoint;
-        private string _id;
         private SscpCompressionContext _sscpCompressionContext, _otherSscpCompressionContext;
 
         public bool Connected
@@ -43,6 +42,14 @@ namespace SSCP
             get
             {
                 return _ipEndPoint.Port;
+            }
+        }
+
+        public SscpServer Server
+        {
+            get
+            {
+                return _server;
             }
         }
 
@@ -115,7 +122,7 @@ namespace SSCP
 
         public async Task SendAsync(byte[] data, SscpPacketType sscpPacketType = SscpPacketType.DATA)
         {
-            byte[] generatedKeyPart = SscpGlobal.SscpRandom.GetRandomBytes(SscpGlobal.PACKET_GENERATED_KEY_LENGTH);
+            byte[] generatedKeyPart = SscpUtils.GetRandomByteArray(SscpGlobal.PACKET_GENERATED_KEY_LENGTH);
             byte[] packetId = SscpUtils.GeneratePacketID();
 
             data = SscpUtils.Combine(BitConverter.GetBytes(ServerPacketNumber), packetId, BitConverter.GetBytes(SscpUtils.GetTimestamp()), data);

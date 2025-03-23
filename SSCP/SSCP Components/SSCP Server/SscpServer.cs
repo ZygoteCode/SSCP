@@ -486,7 +486,7 @@ namespace SSCP
                     case 2:
                         sscpServerUser.FromClientRSA = new System.Security.Cryptography.RSACryptoServiceProvider();
                         sscpServerUser.FromClientRSA.FromXmlString(Encoding.UTF8.GetString(data));
-                        sscpServerUser.AesTempKey = SscpGlobal.SscpRandom.GetRandomBytes(SscpGlobal.MID_HASH_SIZE);
+                        sscpServerUser.AesTempKey = SscpUtils.GetRandomByteArray(SscpGlobal.MID_HASH_SIZE);
 
                         await SendAsyncPrivate(sscpServerUser, sscpServerUser.FromClientRSA.Encrypt(sscpServerUser.AesTempKey, false));
                         sscpServerUser.HandshakeStep = 3;
