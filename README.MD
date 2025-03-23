@@ -96,8 +96,8 @@ public class Test
 - [ ] **Features (release V6?):**
   - [ ] Allow better chunking for big datas (like images, videos, ...) - this can allow upload/download of files
   - [ ] Anti DDoS feature (max packets in seconds/milliseconds, data patterns, strange IP addresses ranges in a span of time, anti HTTP requests spam, ...)
-  - [ ] Error handling to prevent lose data, lose connections, or temporary downtimes
-  - [ ] Reduce Server and Client load by optimizing the code (code size, number of instructions, use of correct collections, ...)
+  - [ x ] Error handling to prevent lose data, lose connections, or temporary downtimes
+  - [ x ] Reduce Server and Client load by optimizing the code (code size, number of instructions, use of correct collections, ...)
 
 ## Discarded Ideas
   - [ ] ~~Implement a new step in the Handshake, similar to the Sec-WebSocket-Key (https://stackoverflow.com/questions/18265128/what-is-sec-websocket-key-for)~~
