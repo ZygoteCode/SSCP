@@ -2,65 +2,30 @@
 using System.Net.WebSockets;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using SSCP.Utils;
 
 namespace SSCP
 {
     public class SscpServerUser
     {
-        private SscpServer _server;
-        private WebSocket _webSocket;
-        private IPEndPoint _ipEndPoint;
-        private SscpCompressionContext _sscpCompressionContext, _otherSscpCompressionContext;
+        private readonly SscpServer _server;
+        private readonly WebSocket _webSocket;
+        private readonly IPEndPoint _ipEndPoint;
+        private readonly SscpCompressionContext _sscpCompressionContext = new();
+        private readonly SscpCompressionContext _otherSscpCompressionContext = new();
+        private readonly SemaphoreSlim _sendLock = new(1, 1);
 
-        public bool Connected
-        {
-            get
-            {
-                return _webSocket.State == WebSocketState.Open;
-            }
-        }
-
-        public IPEndPoint ConnectionIpEndPoint
-        {
-            get
-            {
-                return _ipEndPoint;
-            }
-        }
-
-        public string ConnectionIpAddress
-        {
-            get
-            {
-                return _ipEndPoint.Address.ToString();
-            }
-        }
-
-        public int ConnectionPort
-        {
-            get
-            {
-                return _ipEndPoint.Port;
-            }
-        }
-
-        public SscpServer Server
-        {
-            get
-            {
-                return _server;
-            }
-        }
-
+        public bool Connected => _webSocket.State == WebSocketState.Open;
+        public IPEndPoint ConnectionIpEndPoint => _ipEndPoint;
+        public string ConnectionIpAddress => _ipEndPoint.Address.ToString();
+        public int ConnectionPort => _ipEndPoint.Port;
+        public SscpServer Server => _server;
         public string ID { get; set; }
-
         public double PacketNumber { get; set; }
-
         public double ServerPacketNumber { get; set; }
-
-        public List<byte[]> PacketIds { get; set; }
-        public List<byte[]> ServerPacketIds { get; set; }
+        public List<byte[]> PacketIds { get; set; } = new();
+        public HashSet<byte[]> ServerPacketIds { get; set; } = new();
         public byte HandshakeStep { get; set; }
         public RSACryptoServiceProvider ToClientRSA { get; set; }
         public RSACryptoServiceProvider FromClientRSA { get; set; }
@@ -68,26 +33,21 @@ namespace SSCP
         public byte[] AesKey { get; set; }
         public bool HandshakeCompleted { get; set; }
         public DateTime ConnectedSince { get; set; }
-        public byte[] SecretWebSocketKey { get; set; }
+        public byte[] SecretWebSocketKey { get; }
         public long LastKeepAliveTimestamp { get; set; }
-        public Dictionary<object, object> Properties { get; set; }
+        public Dictionary<object, object> Properties { get; set;  } = new();
 
         public SscpServerUser(SscpServer server, WebSocket webSocket, IPEndPoint ipEndPoint, string id, byte[] secretWebSocketKey)
         {
             LastKeepAliveTimestamp = SscpUtils.GetTimestamp();
-            _sscpCompressionContext = new SscpCompressionContext();
-            _otherSscpCompressionContext = new SscpCompressionContext();
             _server = server;
             _webSocket = webSocket;
             _ipEndPoint = ipEndPoint;
             ID = id;
             PacketNumber = 0.0;
             ServerPacketNumber = 0.0;
-            PacketIds = new List<byte[]>();
-            ServerPacketIds = new List<byte[]>();
             HandshakeStep = 0;
             SecretWebSocketKey = secretWebSocketKey;
-            Properties = new Dictionary<object, object>();
         }
 
         public byte[] Decompress(byte[] data)
@@ -120,39 +80,41 @@ namespace SSCP
             KickAsync().GetAwaiter().GetResult();
         }
 
-        public async Task SendAsync(byte[] data, SscpPacketType sscpPacketType = SscpPacketType.DATA)
+        public async Task SendAsync(byte[] data, SscpPacketType sscpPacketType = SscpPacketType.DATA, CancellationToken cancellationToken = default)
         {
-            byte[] generatedKeyPart = SscpUtils.GetRandomByteArray(SscpGlobal.PACKET_GENERATED_KEY_LENGTH);
-            byte[] packetId = SscpUtils.GeneratePacketID();
+            await _sendLock.WaitAsync(cancellationToken);
 
-            data = SscpUtils.Combine(BitConverter.GetBytes(ServerPacketNumber), packetId, BitConverter.GetBytes(SscpUtils.GetTimestamp()), data);
-            byte[] hash = SscpUtils.HashWithKeccak256(data);
-            data = SscpUtils.Combine(hash, data);
-
-            if (AesKey != null)
+            try
             {
-                data = SscpUtils.ProcessAES256(data, SscpUtils.Combine(AesKey.Skip(SscpGlobal.PACKET_GENERATED_KEY_LENGTH).ToArray(), generatedKeyPart), HandshakeStep == 4 ? SecretWebSocketKey : SscpGlobal.EMPTY_IV, true);
-                byte[] theHash = SscpUtils.HashWithKeccak256(data);
-                data = SscpUtils.Combine(theHash, data);
+                byte[] generatedKeyPart = SscpUtils.GetRandomByteArray(SscpGlobal.PACKET_GENERATED_KEY_LENGTH);
+                byte[] packetId = SscpUtils.GeneratePacketID();
+
+                data = SscpUtils.Combine(BitConverter.GetBytes(ServerPacketNumber), packetId, BitConverter.GetBytes(SscpUtils.GetTimestamp()), data);
+                byte[] hash = SscpUtils.HashWithKeccak256(data);
+                data = SscpUtils.Combine(hash, data);
+
+                if (AesKey != null)
+                {
+                    data = SscpUtils.ProcessAES256(data, SscpUtils.Combine(AesKey.Skip(SscpGlobal.PACKET_GENERATED_KEY_LENGTH).ToArray(), generatedKeyPart), HandshakeStep == 4 ? SecretWebSocketKey : SscpGlobal.EMPTY_IV, true);
+                    byte[] theHash = SscpUtils.HashWithKeccak256(data);
+                    data = SscpUtils.Combine(theHash, data);
+                }
+
+                data = _otherSscpCompressionContext.Compress(data);
+                data = SscpUtils.Combine(generatedKeyPart, BitConverter.GetBytes((int)sscpPacketType), SscpUtils.HashWithKeccak256(data), data);
+
+                await _webSocket.SendAsync(new ArraySegment<byte>(data), WebSocketMessageType.Binary, true, CancellationToken.None);
+                ServerPacketNumber = (ServerPacketNumber + SscpGlobal.PACKET_NUMBER_INCREMENTAL) % SscpGlobal.MAX_PACKET_NUMBER;
+                ServerPacketIds.Add(packetId);
+
+                if (ServerPacketIds.Count > SscpGlobal.PACKET_ID_MAX_COUNT)
+                {
+                    ServerPacketIds.Clear();
+                }
             }
-
-            data = _otherSscpCompressionContext.Compress(data);
-            byte[] compressedDataHash = SscpUtils.HashWithKeccak256(data);
-            data = SscpUtils.Combine(generatedKeyPart, BitConverter.GetBytes((int)sscpPacketType), compressedDataHash, data);
-
-            await _webSocket.SendAsync(new ArraySegment<byte>(data), WebSocketMessageType.Binary, true, CancellationToken.None);
-            ServerPacketNumber += SscpGlobal.PACKET_NUMBER_INCREMENTAL;
-
-            if (ServerPacketNumber >= SscpGlobal.MAX_PACKET_NUMBER)
+            finally
             {
-                ServerPacketNumber = 0.0;
-            }
-
-            ServerPacketIds.Add(packetId);
-
-            if (ServerPacketIds.Count > SscpGlobal.PACKET_ID_MAX_COUNT)
-            {
-                ServerPacketIds.Clear();
+                _sendLock.Release();
             }
         }
 
