@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "C:\\Users\\bolog\\Desktop\\ohgod\\SSCP\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{6CAC98E3-F66F-467D-9EAC-18082A2CAB2C}|SSCP\\SSCP.csproj|c:\\users\\bolog\\desktop\\ohgod\\sscp\\sscp\\sscp utils\\sscputils.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6CAC98E3-F66F-467D-9EAC-18082A2CAB2C}|SSCP\\SSCP.csproj|solutionrelative:sscp\\sscp utils\\sscputils.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{6CAC98E3-F66F-467D-9EAC-18082A2CAB2C}|SSCP\\SSCP.csproj|c:\\users\\bolog\\desktop\\ohgod\\sscp\\sscp\\sscp components\\sscp server\\sscpserver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{6CAC98E3-F66F-467D-9EAC-18082A2CAB2C}|SSCP\\SSCP.csproj|solutionrelative:sscp\\sscp components\\sscp server\\sscpserver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
@@ -19,12 +23,25 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "SscpUtils.cs",
+              "DocumentMoniker": "C:\\Users\\bolog\\Desktop\\ohgod\\SSCP\\SSCP\\SSCP Utils\\SscpUtils.cs",
+              "RelativeDocumentMoniker": "SSCP\\SSCP Utils\\SscpUtils.cs",
+              "ToolTip": "C:\\Users\\bolog\\Desktop\\ohgod\\SSCP\\SSCP\\SSCP Utils\\SscpUtils.cs",
+              "RelativeToolTip": "SSCP\\SSCP Utils\\SscpUtils.cs",
+              "ViewState": "AgIAABkAAAAAAAAAAAAgwCoAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-23T07:55:42.791Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
               "Title": "SscpServer.cs",
               "DocumentMoniker": "C:\\Users\\bolog\\Desktop\\ohgod\\SSCP\\SSCP\\SSCP Components\\SSCP Server\\SscpServer.cs",
               "RelativeDocumentMoniker": "SSCP\\SSCP Components\\SSCP Server\\SscpServer.cs",
               "ToolTip": "C:\\Users\\bolog\\Desktop\\ohgod\\SSCP\\SSCP\\SSCP Components\\SSCP Server\\SscpServer.cs",
               "RelativeToolTip": "SSCP\\SSCP Components\\SSCP Server\\SscpServer.cs",
-              "ViewState": "AgIAAOQBAAAAAAAAAAAnwPUBAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAALQBAAAAAAAAAAAnwPoBAAAeAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-03-23T07:52:48.265Z",
               "EditorCaption": ""

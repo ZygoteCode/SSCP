@@ -8,15 +8,32 @@ namespace SSCP.Utils
 {
     internal class SscpUtils
     {
-        public static byte[] Combine(params byte[][] arrays)
+        public static unsafe byte[] Combine(params byte[][] arrays)
         {
-            byte[] ret = new byte[arrays.Sum(x => x.Length)];
-            int offset = 0;
+            int totalLength = 0;
 
-            foreach (byte[] data in arrays)
+            foreach (byte[] array in arrays)
             {
-                Buffer.BlockCopy(data, 0, ret, offset, data.Length);
-                offset += data.Length;
+                totalLength += array.Length;
+            }
+
+            byte[] ret = new byte[totalLength];
+
+            fixed (byte* retPtr = ret)
+            {
+                byte* currentPtr = retPtr;
+
+                foreach (byte[] data in arrays)
+                {
+                    if (data != null && data.Length > 0)
+                    {
+                        fixed (byte* dataPtr = data)
+                        {
+                            Buffer.MemoryCopy(dataPtr, currentPtr, data.Length, data.Length);
+                            currentPtr += data.Length;
+                        }
+                    }
+                }
             }
 
             return ret;
@@ -53,15 +70,7 @@ namespace SSCP.Utils
                 return false;
             }
 
-            for (int i = 0; i < first.Length; i++)
-            {
-                if (first[i] != second[i])
-                {
-                    return false;
-                }
-            }
-
-            return true;
+            return first.AsSpan().SequenceEqual(second.AsSpan());
         }
 
         public static byte[] ProcessAES256(byte[] data, byte[] key, byte[] iv, bool isEncrypt)
