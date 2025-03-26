@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\bolog\\Desktop\\ohgod\\SSCP\\SscpTest\\SscpTest.csproj": {}
+    "C:\\Users\\ZygoteCode\\Desktop\\ohgod\\SSCP\\SscpTest\\SscpTest.csproj": {}
   },
   "projects": {
-    "C:\\Users\\bolog\\Desktop\\ohgod\\SSCP\\SscpTest\\SscpTest.csproj": {
+    "C:\\Users\\ZygoteCode\\Desktop\\ohgod\\SSCP\\SscpTest\\SscpTest.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\bolog\\Desktop\\ohgod\\SSCP\\SscpTest\\SscpTest.csproj",
+        "projectUniqueName": "C:\\Users\\ZygoteCode\\Desktop\\ohgod\\SSCP\\SscpTest\\SscpTest.csproj",
         "projectName": "SscpTest",
-        "projectPath": "C:\\Users\\bolog\\Desktop\\ohgod\\SSCP\\SscpTest\\SscpTest.csproj",
-        "packagesPath": "C:\\Users\\bolog\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\bolog\\Desktop\\ohgod\\SSCP\\SscpTest\\obj\\",
+        "projectPath": "C:\\Users\\ZygoteCode\\Desktop\\ohgod\\SSCP\\SscpTest\\SscpTest.csproj",
+        "packagesPath": "C:\\Users\\ZygoteCode\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\ZygoteCode\\Desktop\\ohgod\\SSCP\\SscpTest\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\bolog\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\ZygoteCode\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -28,8 +28,8 @@
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
-              "C:\\Users\\bolog\\Desktop\\ohgod\\SSCP\\SSCP\\SSCP.csproj": {
-                "projectPath": "C:\\Users\\bolog\\Desktop\\ohgod\\SSCP\\SSCP\\SSCP.csproj"
+              "C:\\Users\\ZygoteCode\\Desktop\\ohgod\\SSCP\\SSCP\\SSCP.csproj": {
+                "projectPath": "C:\\Users\\ZygoteCode\\Desktop\\ohgod\\SSCP\\SSCP\\SSCP.csproj"
               }
             }
           }
@@ -69,17 +69,17 @@
         }
       }
     },
-    "C:\\Users\\bolog\\Desktop\\ohgod\\SSCP\\SSCP\\SSCP.csproj": {
+    "C:\\Users\\ZygoteCode\\Desktop\\ohgod\\SSCP\\SSCP\\SSCP.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\bolog\\Desktop\\ohgod\\SSCP\\SSCP\\SSCP.csproj",
+        "projectUniqueName": "C:\\Users\\ZygoteCode\\Desktop\\ohgod\\SSCP\\SSCP\\SSCP.csproj",
         "projectName": "SSCP",
-        "projectPath": "C:\\Users\\bolog\\Desktop\\ohgod\\SSCP\\SSCP\\SSCP.csproj",
-        "packagesPath": "C:\\Users\\bolog\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\bolog\\Desktop\\ohgod\\SSCP\\SSCP\\obj\\",
+        "projectPath": "C:\\Users\\ZygoteCode\\Desktop\\ohgod\\SSCP\\SSCP\\SSCP.csproj",
+        "packagesPath": "C:\\Users\\ZygoteCode\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\ZygoteCode\\Desktop\\ohgod\\SSCP\\SSCP\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\bolog\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\ZygoteCode\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
