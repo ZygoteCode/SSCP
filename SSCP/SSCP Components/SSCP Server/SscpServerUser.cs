@@ -2,7 +2,6 @@
 using System.Net.WebSockets;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading;
 using SSCP.Utils;
 
 namespace SSCP

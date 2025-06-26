@@ -3,12 +3,7 @@ using System.Net.WebSockets;
 using System.Net;
 using System.Text;
 using SSCP.Utils;
-using Org.BouncyCastle.Asn1.Cms;
-using Org.BouncyCastle.Bcpg;
-using Org.BouncyCastle.Utilities;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.Security.Policy;
-using System;
+using System.Collections.Specialized;
 
 namespace SSCP
 {
@@ -51,18 +46,18 @@ namespace SSCP
                 try
                 {
                     HttpListenerContext context = await _httpListener.GetContextAsync();
+                    string ipAddress = context.Request.RemoteEndPoint.Address.ToString();
+
+                    if (BannedIPs.Contains(ipAddress))
+                    {
+                        context.Response.Abort();
+                        continue;
+                    }
 
                     if (context.Request.IsWebSocketRequest)
                     {
                         if (MaxUsers != -1 && CountConnectedUsers >= MaxUsers)
                         {
-                            continue;
-                        }
-
-                        if (BannedIPs.Contains(context.Request.RemoteEndPoint.Address.ToString()))
-                        {
-                            context.Response.StatusCode = SscpGlobal.HTTP_401_UNAUTHORIZED;
-                            context.Response.Close();
                             continue;
                         }
 
@@ -79,9 +74,8 @@ namespace SSCP
                         WebSocket webSocket = webSocketContext.WebSocket;
                         byte[] newSecretWebSocketKey = SscpUtils.GetKeyFromSecretWebSocketKey(secWebSocketKey);
 
-                        var user = new SscpServerUser(this, webSocket, context.Request.RemoteEndPoint, SscpUtils.GenerateUserID(context.Request.RemoteEndPoint.Address.ToString(), context.Request.RemoteEndPoint.Port, newSecretWebSocketKey), newSecretWebSocketKey);
-
-                        var userTask = Task.Run(() => HandleWebSocketCommunication(user));
+                        SscpServerUser user = new SscpServerUser(this, webSocket, context.Request.RemoteEndPoint, SscpUtils.GenerateUserID(ipAddress, context.Request.RemoteEndPoint.Port, newSecretWebSocketKey), newSecretWebSocketKey);
+                        Task userTask = Task.Run(() => HandleWebSocketCommunication(user));
                         _users.TryAdd(user, userTask);
 
                         user.HandshakeStep = 1;
@@ -89,8 +83,8 @@ namespace SSCP
                     }
                     else
                     {
-                        context.Response.StatusCode = SscpGlobal.HTTP_400_BAD_REQUEST;
-                        context.Response.Close();
+                        context.Response.Abort();
+                        BannedIPs.Add(ipAddress);
                     }
                 }
                 catch (Exception ex)
@@ -102,7 +96,7 @@ namespace SSCP
 
         private bool ValidateWebSocketHeaders(HttpListenerContext context)
         {
-            var headers = context.Request.Headers;
+            NameValueCollection headers = context.Request.Headers;
             return headers.AllKeys.Length == 6 &&
                    headers["Sec-WebSocket-Key"] != null &&
                    headers["Sec-WebSocket-Version"] == "13" &&
@@ -317,14 +311,18 @@ namespace SSCP
             MemoryStream receivedDataStream = new MemoryStream();
             CancellationTokenSource keepAliveCts = new CancellationTokenSource();
 
-            var keepAliveTask = Task.Run(async () =>
+            Task keepAliveTask = Task.Run(async () =>
             {
                 try
                 {
                     while (!keepAliveCts.Token.IsCancellationRequested && sscpServerUser.Connected)
                     {
                         await Task.Delay(3000, keepAliveCts.Token);
-                        if (!sscpServerUser.Connected) break;
+
+                        if (!sscpServerUser.Connected)
+                        {
+                            break;
+                        }
 
                         try
                         {
@@ -394,16 +392,28 @@ namespace SSCP
 
                     int offset = 0;
 
-                    if (data.Length < SscpGlobal.PACKET_GENERATED_KEY_LENGTH) goto close;
+                    if (data.Length < SscpGlobal.PACKET_GENERATED_KEY_LENGTH)
+                    {
+                        goto close;
+                    }
+
                     byte[] generatedKeyPart = new byte[SscpGlobal.PACKET_GENERATED_KEY_LENGTH];
                     Buffer.BlockCopy(data, offset, generatedKeyPart, 0, SscpGlobal.PACKET_GENERATED_KEY_LENGTH);
                     offset += SscpGlobal.PACKET_GENERATED_KEY_LENGTH;
 
-                    if (data.Length < offset + SscpGlobal.INTEGER_SIZE) goto close;
+                    if (data.Length < offset + SscpGlobal.INTEGER_SIZE)
+                    {
+                        goto close;
+                    }
+
                     SscpPacketType sscpPacketType = (SscpPacketType)BitConverter.ToInt32(data, offset);
                     offset += SscpGlobal.INTEGER_SIZE;
 
-                    if (data.Length < offset + SscpGlobal.HASH_SIZE) goto close;
+                    if (data.Length < offset + SscpGlobal.HASH_SIZE)
+                    {
+                        goto close;
+                    }
+
                     byte[] compressedDataHash = new byte[SscpGlobal.HASH_SIZE];
                     Buffer.BlockCopy(data, offset, compressedDataHash, 0, SscpGlobal.HASH_SIZE);
                     offset += SscpGlobal.HASH_SIZE;
@@ -422,7 +432,11 @@ namespace SSCP
 
                     if (sscpServerUser.AesKey != null)
                     {
-                        if (decompressedData.Length < SscpGlobal.HASH_SIZE) goto close;
+                        if (decompressedData.Length < SscpGlobal.HASH_SIZE)
+                        {
+                            goto close;
+                        }
+
                         byte[] theHash = new byte[SscpGlobal.HASH_SIZE];
                         Buffer.BlockCopy(decompressedData, decompressedOffset, theHash, 0, SscpGlobal.HASH_SIZE);
                         decompressedOffset += SscpGlobal.HASH_SIZE;
@@ -430,6 +444,7 @@ namespace SSCP
                         byte[] theNewData = new byte[decompressedData.Length - decompressedOffset];
                         Buffer.BlockCopy(decompressedData, decompressedOffset, theNewData, 0, theNewData.Length);
                         byte[] theNewHash = SscpUtils.HashWithKeccak256(theNewData);
+
                         if (!SscpUtils.CompareByteArrays(theHash, theNewHash))
                         {
                             goto close;
@@ -439,7 +454,11 @@ namespace SSCP
                         decompressedOffset = 0;
                     }
 
-                    if (decompressedData.Length < SscpGlobal.HASH_SIZE) goto close;
+                    if (decompressedData.Length < SscpGlobal.HASH_SIZE)
+                    {
+                        goto close;
+                    }
+
                     byte[] hash = new byte[SscpGlobal.HASH_SIZE];
                     Buffer.BlockCopy(decompressedData, decompressedOffset, hash, 0, SscpGlobal.HASH_SIZE);
                     decompressedOffset += SscpGlobal.HASH_SIZE;
@@ -453,7 +472,11 @@ namespace SSCP
                         goto close;
                     }
 
-                    if (finalData.Length < SscpGlobal.DOUBLE_SIZE) goto close;
+                    if (finalData.Length < SscpGlobal.DOUBLE_SIZE)
+                    {
+                        goto close;
+                    }
+
                     double packetNumber = BitConverter.ToDouble(finalData, 0);
 
                     if (packetNumber != sscpServerUser.PacketNumber)
@@ -463,7 +486,11 @@ namespace SSCP
 
                     int finalOffset = SscpGlobal.DOUBLE_SIZE;
 
-                    if (finalData.Length < finalOffset + SscpGlobal.HASH_SIZE) goto close;
+                    if (finalData.Length < finalOffset + SscpGlobal.HASH_SIZE)
+                    {
+                        goto close;
+                    }
+
                     byte[] packetId = new byte[SscpGlobal.HASH_SIZE];
                     Buffer.BlockCopy(finalData, finalOffset, packetId, 0, SscpGlobal.HASH_SIZE);
                     finalOffset += SscpGlobal.HASH_SIZE;
@@ -473,7 +500,11 @@ namespace SSCP
                         goto close;
                     }
 
-                    if (finalData.Length < finalOffset + SscpGlobal.LONG_SIZE) goto close;
+                    if (finalData.Length < finalOffset + SscpGlobal.LONG_SIZE)
+                    {
+                        goto close;
+                    }
+
                     long timestamp = BitConverter.ToInt64(finalData, finalOffset);
 
                     if (SscpUtils.GetTimestamp() - timestamp > SscpGlobal.MAX_TIMESTAMP_DELAY)
@@ -482,19 +513,22 @@ namespace SSCP
                     }
 
                     finalOffset += SscpGlobal.LONG_SIZE;
-
                     sscpServerUser.PacketNumber += SscpGlobal.PACKET_NUMBER_INCREMENTAL;
+
                     if (sscpServerUser.PacketNumber >= SscpGlobal.MAX_PACKET_NUMBER)
                     {
                         sscpServerUser.PacketNumber = 0.0;
                     }
+
                     sscpServerUser.PacketIds.Add(packetId);
+
                     if (sscpServerUser.PacketIds.Count > SscpGlobal.PACKET_ID_MAX_COUNT)
                     {
                         sscpServerUser.PacketIds.Clear();
                     }
 
                     byte[] actualData = new byte[finalData.Length - finalOffset];
+
                     if (actualData.Length > 0)
                     {
                         Buffer.BlockCopy(finalData, finalOffset, actualData, 0, actualData.Length);
@@ -527,11 +561,7 @@ namespace SSCP
                         case 4:
                             PacketReceived?.Invoke(sscpServerUser, new SscpPacket(sscpPacketType, actualData));
 
-                            if (sscpPacketType == SscpPacketType.DATA)
-                            {
-                                Send(sscpServerUser, Encoding.UTF8.GetBytes($"Hello! I received your message: => \"{Encoding.UTF8.GetString(actualData)}\"."));
-                            }
-                            else if (sscpPacketType == SscpPacketType.KEEP_ALIVE)
+                            if (sscpPacketType == SscpPacketType.KEEP_ALIVE)
                             {
                                 long keepAliveTimestamp = BitConverter.ToInt64(actualData);
                                 long currentKeepAliveTimestamp = SscpUtils.GetTimestamp();

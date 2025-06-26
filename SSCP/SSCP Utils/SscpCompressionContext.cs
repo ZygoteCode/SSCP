@@ -57,6 +57,7 @@ namespace SSCP.Utils
         {
             ArrayPool<byte>.Shared.Return(_deflateBuffer);
             ArrayPool<byte>.Shared.Return(_inflateBuffer);
+
             _deflator?.EndDeflate();
             _inflator?.EndInflate();
         }

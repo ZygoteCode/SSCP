@@ -11,14 +11,23 @@ namespace SSCP
         public bool Equals(byte[]? x, byte[]? y)
         {
             if (ReferenceEquals(x, y))
+            {
                 return true;
+            }
+
             if (x == null || y == null || x.Length != y.Length)
+            {
                 return false;
+            }
+
             for (int i = 0; i < x.Length; i++)
             {
                 if (x[i] != y[i])
+                {
                     return false;
+                }
             }
+
             return true;
         }
 
@@ -27,11 +36,12 @@ namespace SSCP
             unchecked
             {
                 int hash = 17;
-                // Usa alcuni byte per il calcolo dell'hash (dato che la lunghezza è fissa)
+
                 for (int i = 0; i < Math.Min(obj.Length, 8); i++)
                 {
                     hash = hash * 31 + obj[i];
                 }
+
                 return hash;
             }
         }
@@ -94,7 +104,6 @@ namespace SSCP
             }
 
             _ = Task.Run(ReceiveMessages);
-
             await _handshakeTcs.Task;
 
             _keepAliveTimer = new Timer(state =>
@@ -104,7 +113,9 @@ namespace SSCP
                     _keepAliveTimer?.Dispose();
                     return;
                 }
+
                 long now = SscpUtils.GetTimestamp();
+
                 if (now - _lastKeepAliveTimestamp > SscpGlobal.MAX_TIMESTAMP_DELAY)
                 {
                     Disconnect();
@@ -170,6 +181,7 @@ namespace SSCP
 
             await _client.SendAsync(new ArraySegment<byte>(data), WebSocketMessageType.Binary, true, CancellationToken.None);
             _packetNumber += SscpGlobal.PACKET_NUMBER_INCREMENTAL;
+
             if (_packetNumber >= SscpGlobal.MAX_PACKET_NUMBER)
             {
                 _packetNumber = 0.0;
@@ -199,7 +211,8 @@ namespace SSCP
                 while (_client.State == WebSocketState.Open)
                 {
                     int totalBytes = 0;
-                    using (var ms = new MemoryStream())
+
+                    using (MemoryStream ms = new MemoryStream())
                     {
                         WebSocketReceiveResult result;
                         do
@@ -220,6 +233,7 @@ namespace SSCP
                         byte[] compressedDataHash = data.Take(SscpGlobal.HASH_SIZE).ToArray();
                         data = data.Skip(SscpGlobal.HASH_SIZE).ToArray();
                         byte[] currentCompressedDataHash = SscpUtils.HashWithKeccak256(data);
+
                         if (!SscpUtils.CompareByteArrays(compressedDataHash, currentCompressedDataHash))
                         {
                             await DisconnectAsync();
@@ -246,6 +260,7 @@ namespace SSCP
                         byte[] hash = data.Take(SscpGlobal.HASH_SIZE).ToArray();
                         data = data.Skip(SscpGlobal.HASH_SIZE).ToArray();
                         byte[] newHash = SscpUtils.HashWithKeccak256(data);
+
                         if (!SscpUtils.CompareByteArrays(hash, newHash))
                         {
                             await DisconnectAsync();
@@ -253,36 +268,41 @@ namespace SSCP
                         }
 
                         double packetNumber = BitConverter.ToDouble(data.Take(SscpGlobal.DOUBLE_SIZE).ToArray(), 0);
+
                         if (packetNumber != _serverPacketNumber)
                         {
                             await DisconnectAsync();
                             return;
                         }
-                        data = data.Skip(SscpGlobal.DOUBLE_SIZE).ToArray();
 
+                        data = data.Skip(SscpGlobal.DOUBLE_SIZE).ToArray();
                         byte[] packetId = data.Take(SscpGlobal.HASH_SIZE).ToArray();
+
                         if (_serverPacketIds.Contains(packetId))
                         {
                             await DisconnectAsync();
                             return;
                         }
-                        data = data.Skip(SscpGlobal.HASH_SIZE).ToArray();
 
+                        data = data.Skip(SscpGlobal.HASH_SIZE).ToArray();
                         long timestamp = BitConverter.ToInt64(data.Take(SscpGlobal.LONG_SIZE).ToArray());
+
                         if (SscpUtils.GetTimestamp() - timestamp > SscpGlobal.MAX_TIMESTAMP_DELAY)
                         {
                             await DisconnectAsync();
                             return;
                         }
-                        data = data.Skip(SscpGlobal.LONG_SIZE).ToArray();
 
+                        data = data.Skip(SscpGlobal.LONG_SIZE).ToArray();
                         _serverPacketNumber += SscpGlobal.PACKET_NUMBER_INCREMENTAL;
+
                         if (_serverPacketNumber >= SscpGlobal.MAX_PACKET_NUMBER)
                         {
                             _serverPacketNumber = 0.0;
                         }
 
                         _serverPacketIds.Add(packetId);
+
                         if (_serverPacketIds.Count > SscpGlobal.PACKET_ID_MAX_COUNT)
                         {
                             _serverPacketIds.Clear();
@@ -321,15 +341,18 @@ namespace SSCP
                                 break;
                             case 4:
                                 PacketReceived?.Invoke(new SscpPacket(sscpPacketType, data));
+
                                 if (sscpPacketType.Equals(SscpPacketType.KEEP_ALIVE))
                                 {
                                     long keepAliveTimestamp = BitConverter.ToInt64(data),
                                          currentKeepAliveTimestamp = SscpUtils.GetTimestamp();
+
                                     if (currentKeepAliveTimestamp - keepAliveTimestamp > SscpGlobal.MAX_TIMESTAMP_DELAY)
                                     {
                                         await DisconnectAsync();
                                         return;
                                     }
+
                                     Send(BitConverter.GetBytes(currentKeepAliveTimestamp), SscpPacketType.KEEP_ALIVE);
                                     _lastKeepAliveTimestamp = keepAliveTimestamp;
                                 }

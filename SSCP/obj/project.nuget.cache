@@ -1,26 +1,28 @@
 {
   "version": 2,
-  "dgSpecHash": "H6u9oQK2IIk=",
+  "dgSpecHash": "GzFfUouVpZ8=",
   "success": true,
-  "projectFilePath": "C:\\Users\\ZygoteCode\\Desktop\\ohgod\\SSCP\\SSCP\\SSCP.csproj",
+  "projectFilePath": "C:\\Users\\Z\\Desktop\\GitHub Repositories\\SSCP\\SSCP\\SSCP.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\ZygoteCode\\.nuget\\packages\\bouncycastle.cryptography\\2.4.0\\bouncycastle.cryptography.2.4.0.nupkg.sha512",
-    "C:\\Users\\ZygoteCode\\.nuget\\packages\\dotnetzip\\1.16.0\\dotnetzip.1.16.0.nupkg.sha512",
-    "C:\\Users\\ZygoteCode\\.nuget\\packages\\microsoft.netcore.platforms\\3.1.1\\microsoft.netcore.platforms.3.1.1.nupkg.sha512",
-    "C:\\Users\\ZygoteCode\\.nuget\\packages\\microsoft.win32.systemevents\\4.7.0\\microsoft.win32.systemevents.4.7.0.nupkg.sha512",
-    "C:\\Users\\ZygoteCode\\.nuget\\packages\\system.drawing.common\\4.7.0\\system.drawing.common.4.7.0.nupkg.sha512",
-    "C:\\Users\\ZygoteCode\\.nuget\\packages\\system.security.accesscontrol\\4.7.0\\system.security.accesscontrol.4.7.0.nupkg.sha512",
-    "C:\\Users\\ZygoteCode\\.nuget\\packages\\system.security.permissions\\4.7.0\\system.security.permissions.4.7.0.nupkg.sha512",
-    "C:\\Users\\ZygoteCode\\.nuget\\packages\\system.security.principal.windows\\4.7.0\\system.security.principal.windows.4.7.0.nupkg.sha512",
-    "C:\\Users\\ZygoteCode\\.nuget\\packages\\system.text.encoding.codepages\\4.7.1\\system.text.encoding.codepages.4.7.1.nupkg.sha512",
-    "C:\\Users\\ZygoteCode\\.nuget\\packages\\system.windows.extensions\\4.7.0\\system.windows.extensions.4.7.0.nupkg.sha512"
+    "C:\\Users\\Z\\.nuget\\packages\\bouncycastle.cryptography\\2.4.0\\bouncycastle.cryptography.2.4.0.nupkg.sha512",
+    "C:\\Users\\Z\\.nuget\\packages\\dotnetzip\\1.16.0\\dotnetzip.1.16.0.nupkg.sha512",
+    "C:\\Users\\Z\\.nuget\\packages\\microsoft.netcore.platforms\\3.1.1\\microsoft.netcore.platforms.3.1.1.nupkg.sha512",
+    "C:\\Users\\Z\\.nuget\\packages\\microsoft.win32.systemevents\\4.7.0\\microsoft.win32.systemevents.4.7.0.nupkg.sha512",
+    "C:\\Users\\Z\\.nuget\\packages\\system.drawing.common\\4.7.0\\system.drawing.common.4.7.0.nupkg.sha512",
+    "C:\\Users\\Z\\.nuget\\packages\\system.security.accesscontrol\\4.7.0\\system.security.accesscontrol.4.7.0.nupkg.sha512",
+    "C:\\Users\\Z\\.nuget\\packages\\system.security.permissions\\4.7.0\\system.security.permissions.4.7.0.nupkg.sha512",
+    "C:\\Users\\Z\\.nuget\\packages\\system.security.principal.windows\\4.7.0\\system.security.principal.windows.4.7.0.nupkg.sha512",
+    "C:\\Users\\Z\\.nuget\\packages\\system.text.encoding.codepages\\4.7.1\\system.text.encoding.codepages.4.7.1.nupkg.sha512",
+    "C:\\Users\\Z\\.nuget\\packages\\system.windows.extensions\\4.7.0\\system.windows.extensions.4.7.0.nupkg.sha512"
   ],
   "logs": [
     {
       "code": "NU1903",
       "level": "Warning",
-      "warningLevel": 1,
       "message": "Il pacchetto 'DotNetZip' 1.16.0 presenta una vulnerabilità nota di gravità alta, https://github.com/advisories/GHSA-xhg6-9j5j-w4vf",
+      "projectPath": "C:\\Users\\Z\\Desktop\\GitHub Repositories\\SSCP\\SSCP\\SSCP.csproj",
+      "warningLevel": 1,
+      "filePath": "C:\\Users\\Z\\Desktop\\GitHub Repositories\\SSCP\\SSCP\\SSCP.csproj",
       "libraryId": "DotNetZip",
       "targetGraphs": [
         "net9.0"
