@@ -83,20 +83,6 @@ public class Test
 }
 ```
 
-## Todo List
-
-- [ ] **High Priority:**
-
-  - [ ] Implement all SscpClient's features in JavaScript client-side for browsers
-  - [ ] Documentation
-  - [ ] User guide
-  - [ ] Complete tests
-  - [ ] Official explanation of the protocol
-  
-- [ ] **Features (release V7 possibly?):**
-  - [ ] Allow better chunking for big datas (like images, videos, ...) - this can allow upload/download of files
-  - [x] Anti DDoS feature (max packets in seconds/milliseconds, data patterns, strange IP addresses ranges in a span of time, anti HTTP requests spam, ...)
-
 ## Discarded Ideas
   - [ ] ~~Implement a new step in the Handshake, similar to the Sec-WebSocket-Key (https://stackoverflow.com/questions/18265128/what-is-sec-websocket-key-for)~~
   - [ ] ~~(Teoric) HWID (hashed) authentication system~~ - We can't go through into specific dynamics, this can be managed by servers' creators.
