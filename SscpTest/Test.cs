@@ -18,6 +18,15 @@ public class Test
             _sscpServer.Start();
         }).Start();
 
+        new Thread(() =>
+        {
+            while (true)
+            {
+                Thread.Sleep(2000);
+                _sscpServer.Broadcast("Umh... hello? This is a broadcast. Every client connected received this.");
+            }
+        }).Start();
+
         _sscpClient.ConnectionOpened += SscpClient_ConnectionOpened;
         _sscpClient.ConnectionClosed += SscpClient_ConnectionClosed;
         _sscpClient.PacketReceived += _sscpClient_PacketReceived;
@@ -42,6 +51,11 @@ public class Test
         if (arg2.SscpPacketType.Equals(SscpPacketType.DATA))
         {
             Console.WriteLine($"[SERVER] A User ({arg1.ID}) has sent a new message to the Server => {arg2}");
+
+            if (arg2.ToString() == "help")
+            {
+                arg1.Send("I can't help you with that request, sorry.");
+            }
         }
     }
 
